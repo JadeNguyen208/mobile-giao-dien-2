@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản Lý Công Việc</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-dark: #1a4a2e; --green-main: #2d6a4f; --green-mid: #3a8a62;
+    --green-light: #52b788; --green-pale: #e8f5ee; --green-bg: #eef7f2;
+    --gold: #c9a84c; --gold-light: #f0d080;
+    --tb-bg: #fad96a; --tb-border: #f0c840; --tb-logo-text: #7a3a00;
+    --tb-text: #5a2d00; --tb-lunar: #8b4a00; --tb-sep: rgba(90,45,0,0.18);
+    --burgundy: #6b1a1a;
+    --gray-100: #f8f9fa; --gray-200: #e9ecef; --gray-300: #dee2e6;
+    --gray-500: #adb5bd; --gray-600: #6c757d; --gray-800: #343a40;
+    --shadow-sm: 0 1px 5px rgba(0,0,0,0.06);
+    --radius: 12px; --radius-sm: 7px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Be Vietnam Pro','Segoe UI',sans-serif; background:var(--green-bg); color:var(--gray-800); font-size:17px; min-height:100vh; }
+
+  /* TOPBAR */
+  .topbar { background:var(--tb-bg); border-bottom:2.5px solid var(--tb-border); display:flex; align-items:center; padding:0 24px; height:64px; position:sticky; top:0; z-index:200; box-shadow:0 2px 10px rgba(200,140,0,0.18); gap:8px; }
+  .topbar-brand { display:flex; align-items:center; gap:10px; padding-right:18px; border-right:1.5px solid var(--tb-sep); flex-shrink:0; }
+  .logo-icon { width:36px; height:36px; border-radius:7px; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .app-name { font-size:16px; font-weight:800; color:var(--burgundy); white-space:nowrap; }
+  .topbar-datetime { display:flex; flex-direction:column; align-items:center; padding:0 18px; border-right:1.5px solid var(--tb-sep); line-height:1.3; flex-shrink:0; }
+  .topbar-datetime .dt-duong { font-size:14px; font-weight:700; color:var(--tb-text); }
+  .topbar-datetime .dt-am   { font-size:12.5px; color:var(--tb-lunar); font-weight:500; }
+  .topbar-nav { display:flex; align-items:center; gap:2px; padding:0 12px; flex:1; }
+  .topbar-nav-item { padding:8px 16px; border-radius:7px; cursor:pointer; font-size:14.5px; font-weight:600; color:var(--tb-text); white-space:nowrap; transition:all .15s; display:flex; align-items:center; gap:5px; }
+  .topbar-nav-item:hover { background:rgba(255,255,255,.35); }
+  .topbar-nav-item.active { background:rgba(255,255,255,.5); color:var(--burgundy); }
+  .topbar-actions { display:flex; align-items:center; gap:6px; margin-left:auto; flex-shrink:0; }
+  .tb-action { padding:8px 15px; border-radius:7px; cursor:pointer; font-size:14px; font-weight:600; color:var(--tb-text); border:1.5px solid rgba(90,45,0,.22); background:rgba(255,255,255,.3); font-family:inherit; transition:all .15s; white-space:nowrap; display:flex; align-items:center; gap:5px; }
+  .tb-action:hover { background:rgba(255,255,255,.5); }
+  .tb-action.primary { background:var(--green-main); border-color:var(--green-main); color:white; font-weight:700; }
+  .tb-action.primary:hover { background:var(--green-dark); }
+  .user-block { display:flex; align-items:center; gap:8px; cursor:pointer; flex-shrink:0; padding-left:12px; border-left:1.5px solid var(--tb-sep); }
+  .avatar { width:38px; height:38px; background:var(--tb-logo-text); color:var(--tb-bg); border-radius:8px; font-weight:800; font-size:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .user-info { display:flex; flex-direction:column; }
+  .user-name { font-size:13px; font-weight:700; color:var(--tb-text); white-space:nowrap; }
+  .user-role { font-size:11px; color:var(--tb-lunar); font-weight:500; white-space:nowrap; }
+
+  .content { max-width:1700px; margin:0 auto; padding:22px 28px; }
+
+  /* BAN HEADER + FILTER */
+  .ban-filter-bar { background:white; border-radius:var(--radius); box-shadow:var(--shadow-sm); margin-bottom:0; border:1.5px solid rgba(45,106,79,.12); overflow:visible; border-bottom-left-radius:0; border-bottom-right-radius:0; border-bottom:none; }
+  .ban-filter-top { display:flex; align-items:center; padding:16px 22px 14px; gap:20px; flex-wrap:wrap; }
+  .ban-info { flex-shrink:0; }
+  .ban-info h2 { font-size:22px; font-weight:800; color:var(--green-dark); letter-spacing:.3px; }
+  .ban-info .meta { font-size:15px; color:#5a7060; font-weight:500; margin-top:2px; }
+  .ban-info .meta span { color:var(--green-dark); font-weight:700; }
+  .ban-filter-sep { width:1px; height:38px; background:var(--gray-200); flex-shrink:0; }
+  .filter-controls { display:flex; align-items:center; gap:10px; flex-wrap:wrap; flex:1; }
+
+  /* Keyword search */
+  .search-wrap { display:flex; align-items:center; gap:7px; background:var(--gray-100); border:1.5px solid var(--gray-300); border-radius:22px; padding:8px 16px; transition:border-color .15s; }
+  .search-wrap:focus-within { border-color:var(--green-light); background:white; box-shadow:0 0 0 3px rgba(82,183,136,.12); }
+  .search-wrap svg { width:16px; height:16px; color:var(--gray-500); flex-shrink:0; }
+  .search-wrap input { border:none; background:transparent; font-family:inherit; font-size:15px; color:var(--gray-800); outline:none; width:200px; }
+  .search-wrap input::placeholder { color:var(--gray-500); }
+
+  /* Dropdowns */
+  .dd-wrap { position:relative; }
+  .dd-btn { padding:8px 15px; border-radius:22px; border:1.5px solid var(--gray-300); background:var(--gray-100); font-family:inherit; font-size:14.5px; cursor:pointer; color:var(--gray-600); font-weight:600; display:flex; align-items:center; gap:7px; white-space:nowrap; transition:all .15s; min-width:170px; justify-content:space-between; }
+  .dd-btn:hover,.dd-btn.open { border-color:var(--green-light); color:var(--green-dark); background:var(--green-pale); }
+  .dd-arrow { font-size:10px; transition:transform .15s; }
+  .dd-btn.open .dd-arrow { transform:rotate(180deg); }
+  .dd-left { display:flex; align-items:center; gap:7px; }
+  .dd-menu { position:absolute; top:calc(100% + 6px); left:0; z-index:300; background:white; border:1.5px solid var(--gray-300); border-radius:var(--radius-sm); box-shadow:0 6px 24px rgba(0,0,0,.12); min-width:240px; overflow:hidden; display:none; }
+  .dd-menu.open { display:block; }
+  .dd-opt { padding:11px 17px; font-size:15px; color:var(--gray-800); cursor:pointer; display:flex; align-items:center; gap:9px; font-weight:500; transition:background .12s; }
+  .dd-opt:hover { background:var(--green-pale); color:var(--green-dark); }
+  .dd-opt.selected { background:var(--green-pale); color:var(--green-dark); font-weight:700; }
+  .dd-sep { border:none; border-top:1px solid var(--gray-200); margin:4px 0; }
+
+  /* Date range */
+  .date-range-row { padding:12px 16px 16px; border-top:1px solid var(--gray-200); }
+  .dr-group { margin-bottom:10px; }
+  .dr-group label { font-size:13px; font-weight:700; color:var(--gray-600); display:block; margin-bottom:4px; text-transform:uppercase; letter-spacing:.03em; }
+  .dr-apply { width:100%; padding:9px; background:var(--green-main); color:white; border:none; border-radius:6px; font-family:inherit; font-size:15px; cursor:pointer; font-weight:700; margin-top:2px; transition:background .15s; }
+  .dr-apply:hover { background:var(--green-dark); }
+
+  /* ─── STATUS LEGEND BAR (below ban filter bar) ─── */
+  .status-legend {
+    display:flex; align-items:center; gap:18px;
+    background:white;
+    border:1.5px solid rgba(45,106,79,.12);
+    border-top:1px solid var(--gray-200);
+    border-radius:0 0 var(--radius) var(--radius);
+    padding:11px 22px;
+    margin-bottom:16px;
+    box-shadow:var(--shadow-sm);
+    flex-wrap:wrap;
+  }
+  .legend-title { font-size:13.5px; font-weight:700; color:var(--gray-600); margin-right:2px; flex-shrink:0; }
+  .legend-item { display:flex; align-items:center; gap:7px; font-size:15px; font-weight:600; color:var(--gray-800); }
+  .legend-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+  .ld-urgent    { background:#c0392b; box-shadow:0 0 0 3px rgba(192,57,43,.2); }
+  .ld-important { background:#e07b39; box-shadow:0 0 0 3px rgba(224,123,57,.18); }
+  .ld-waiting   { background:#c9a84c; box-shadow:0 0 0 3px rgba(201,168,76,.22); }
+  .ld-normal    { background:#2d6a4f; box-shadow:0 0 0 3px rgba(45,106,79,.2); }
+  .ld-sep { width:1px; height:20px; background:var(--gray-200); }
+
+  /* STATUS TOGGLE — desktop: vẫn nằm legend bar */
+  .legend-spacer { flex:1; }
+  .status-toggle-wrap { display:flex; align-items:center; gap:0; background:var(--gray-100); border:1.5px solid var(--gray-300); border-radius:22px; padding:3px; flex-shrink:0; }
+  .status-toggle-btn { padding:6px 16px; border-radius:18px; font-size:14px; font-weight:700; cursor:pointer; transition:all .2s; color:var(--gray-600); white-space:nowrap; border:none; background:transparent; font-family:inherit; }
+  /* ── CHANGE 1: active = cam #FD8A02 cho cả 2 nút ── */
+  .status-toggle-btn.active { background:#FD8A02; color:white; box-shadow:0 2px 6px rgba(200,80,0,.28); }
+  .status-toggle-btn:not(.active):hover { color:#FD8A02; background:#fff3ea; }
+
+  /* TABLE */
+  .table-wrap { background:white; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-sm); }
+  .task-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+  .task-table colgroup .c1 { width:32%; }
+  .task-table colgroup .c2 { width:36%; }
+  .task-table colgroup .c3 { width:32%; }
+  /* ── CHANGE 2: thead font-size 19px → 17px ── */
+  .task-table thead th { background:var(--green-dark); color:white; padding:16px 22px; text-align:left; font-size:17px; font-weight:700; letter-spacing:.3px; border-right:1px solid rgba(255,255,255,.1); }
+  .task-table thead th:last-child { border-right:none; }
+  .task-table thead th.col-sp { color:var(--gold-light); }
+  .task-table tbody tr { border-bottom:1px solid #ddeae3; transition:background .12s; }
+  .task-table tbody tr:nth-child(even) { background:#fafdf8; }
+  .task-table tbody tr:nth-child(odd) { background:white; }
+  .task-table tbody tr:last-child { border-bottom:none; }
+  .task-table tbody tr:hover { background:#eef8f2; }
+  .task-table td { padding:22px 22px; vertical-align:top; font-size:17px; color:#111a14; font-weight:500; border-right:1px solid #ddeae3; word-break:break-word; line-height:1.75; }
+  .task-table td:last-child { border-right:none; }
+
+  /* TASK CELL */
+  .task-header { display:flex; align-items:flex-start; gap:11px; margin-bottom:9px; }
+  .status-dot { flex-shrink:0; width:13px; height:13px; border-radius:50%; margin-top:6px; }
+  .dot-urgent    { background:#c0392b; box-shadow:0 0 0 3px rgba(192,57,43,.2); }
+  .dot-important { background:#e07b39; box-shadow:0 0 0 3px rgba(224,123,57,.18); }
+  .dot-waiting   { background:#c9a84c; box-shadow:0 0 0 3px rgba(201,168,76,.22); }
+  .dot-overdue   { background:#8e44ad; box-shadow:0 0 0 3px rgba(142,68,173,.2); }
+  .dot-done      { background:#27ae60; box-shadow:0 0 0 3px rgba(39,174,96,.2); }
+  .dot-doing     { background:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.2); }
+  .dot-normal    { background:#2d6a4f; box-shadow:0 0 0 3px rgba(45,106,79,.2); }
+  .task-name { font-weight:800; font-size:19px; color:#C49A3C; line-height:1.35; }
+  .task-detail-txt { font-size:17px; color:#1a2e1a; font-weight:500; margin:8px 0 6px; line-height:1.75; }
+  .task-time { font-size:17px; color:var(--burgundy); font-weight:700; display:flex; align-items:center; gap:5px; }
+  .task-footer { display:flex; justify-content:space-between; align-items:center; margin-top:14px; gap:8px; }
+  .task-detail-link { display:inline-flex; align-items:center; gap:4px; font-size:15px; font-weight:700; color:var(--green-mid); padding:6px 14px; border:1.5px solid var(--green-light); border-radius:7px; text-decoration:none; transition:all .15s; cursor:pointer; flex-shrink:0; }
+  .task-detail-link:hover { background:var(--green-pale); color:var(--green-dark); border-color:var(--green-main); }
+
+  /* OPINIONS */
+  .opinion-block { font-size:17px; line-height:1.75; color:#111a14; }
+  .op-text { font-weight:500; }
+  .op-author { font-size:17px; color:#2d3f35; margin-top:8px; display:flex; align-items:center; gap:7px; font-weight:600; flex-wrap:wrap; }
+  .op-time { color:var(--burgundy); font-size:17px; font-weight:700; }
+  .author-tag { padding:3px 9px; border-radius:5px; font-weight:700; font-size:16px; }
+  .tag-normal { background:var(--green-pale); color:#0f2d1c; }
+  .tag-sp  { background:#ffe0e0; color:#8b0000; }
+  .tag-bld { background:#fff3cd; color:#7a4a00; }
+  .op-divider { border:none; border-top:1px dashed #c5d9c5; margin:13px 0; }
+  .sp-block + .sp-block { border-top:1.5px dashed #d4b47a; padding-top:13px; margin-top:13px; }
+
+  /* OPINION ACTIONS */
+  .op-actions { display:flex; align-items:center; gap:10px; margin-top:6px; }
+
+  /* Like button */
+  .like-wrap { position:relative; display:inline-block; }
+  .op-like-btn { display:inline-flex; align-items:center; gap:5px; font-size:15px; font-weight:600; color:var(--gray-500); cursor:pointer; border:1.5px solid var(--gray-300); border-radius:20px; padding:5px 14px; background:white; transition:all .15s; font-family:inherit; user-select:none; }
+  .op-like-btn:hover { border-color:var(--green-light); color:var(--green-dark); background:var(--green-pale); }
+  .op-like-btn.liked { border-color:#e07b39; color:#e07b39; background:#fef3ec; }
+  .op-like-count { font-size:14px; font-weight:800; min-width:12px; text-align:center; }
+  .like-label { font-size:14px; }
+
+  /* Likes tooltip popup */
+  .likes-popup { 
+    position:absolute; bottom:calc(100% + 8px); left:0; z-index:500;
+    background:white; border:1.5px solid var(--gray-300); border-radius:10px;
+    box-shadow:0 6px 24px rgba(0,0,0,.15); padding:10px 14px;
+    min-width:200px; max-width:280px;
+    display:none;
+    animation:popupAppear .13s ease;
+  }
+  @keyframes popupAppear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .likes-popup.open { display:block; }
+  .likes-popup-title { font-size:12px; font-weight:700; color:var(--gray-500); text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px; border-bottom:1px solid var(--gray-200); padding-bottom:6px; }
+  .likes-popup-item { display:flex; align-items:center; gap:8px; padding:5px 0; font-size:14px; font-weight:600; color:var(--gray-800); border-bottom:1px solid #f0f0f0; }
+  .likes-popup-item:last-child { border-bottom:none; }
+  .likes-popup-avatar { width:24px; height:24px; border-radius:5px; background:var(--green-pale); color:var(--green-dark); font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .likes-popup-empty { font-size:13px; color:var(--gray-500); font-style:italic; text-align:center; padding:4px 0; }
+
+  .op-edit-btn { display:inline-flex; align-items:center; gap:5px; font-size:15px; font-weight:600; color:var(--gray-500); cursor:pointer; border:1.5px solid var(--gray-300); border-radius:20px; padding:5px 14px; background:white; transition:all .15s; font-family:inherit; }
+  .op-edit-btn:hover { border-color:var(--green-light); color:var(--green-dark); background:var(--green-pale); }
+  .op-edited-tag { font-size:14px; color:var(--gray-500); font-style:italic; font-weight:500; }
+
+  /* Edit inline */
+  .op-edit-area { width:100%; border:1.5px solid var(--green-light); border-radius:7px; padding:9px 12px; font-family:inherit; font-size:16px; color:var(--gray-800); outline:none; resize:vertical; min-height:70px; margin-top:6px; }
+  .op-edit-actions { display:flex; gap:8px; margin-top:7px; }
+  .op-save-btn { padding:6px 16px; background:var(--green-main); color:white; border:none; border-radius:6px; font-family:inherit; font-size:15px; font-weight:700; cursor:pointer; }
+  .op-cancel-btn { padding:6px 16px; background:white; color:var(--gray-600); border:1.5px solid var(--gray-300); border-radius:6px; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer; }
+
+  /* ─── OUTGOING TABLE ─── */
+  .out-table colgroup .oc1 { width:36%; }
+  .out-table colgroup .oc2 { width:28%; }
+  .out-table colgroup .oc3 { width:36%; }
+  .out-table thead th { background:var(--burgundy); }
+  .out-table thead th.col-sp { color:var(--gold-light); }
+  .progress-wrap { display:flex; align-items:center; gap:9px; }
+  .progress-bar { flex:1; height:8px; background:var(--gray-200); border-radius:4px; overflow:hidden; }
+  .progress-fill { height:100%; border-radius:4px; transition:width .3s; }
+  .prog-done    { background:#27ae60; }
+  .prog-partial { background:#e07b39; }
+  .prog-none    { background:#dee2e6; }
+  .progress-pct { font-size:15px; font-weight:700; color:var(--gray-600); flex-shrink:0; }
+  .assigned-ban { font-size:17px; font-weight:700; color:var(--green-dark); margin-bottom:4px; }
+  .assigned-note { font-size:15px; color:var(--gray-600); font-weight:500; }
+
+  /* BOTTOM BAR */
+  .bottom-bar { display:flex; align-items:center; justify-content:space-between; padding:22px 4px 8px; flex-wrap:wrap; gap:8px; }
+  .pg-info { font-size:16px; color:var(--gray-600); font-weight:600; }
+  .pg-info strong { color:var(--green-dark); }
+  .pagination { display:flex; align-items:center; gap:6px; }
+  .pg-btn { min-width:40px; height:40px; border-radius:9px; border:1.5px solid #c3dece; background:#f0f9f4; color:#2d6a4f; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit; display:flex; align-items:center; justify-content:center; padding:0 9px; transition:all .15s; }
+  .pg-btn:hover:not(:disabled) { border-color:var(--green-light); background:#daf0e4; color:var(--green-dark); }
+  .pg-btn.active { background:#c8ecd8; border-color:var(--green-light); color:var(--green-dark); font-weight:800; }
+  .pg-btn:disabled { opacity:.35; cursor:default; }
+  .pg-btn.dots { border:none; background:none; pointer-events:none; color:var(--gray-500); }
+
+  /* LUNAR DATE PICKER */
+  .ldp-wrap { position:relative; display:inline-block; width:100%; }
+  .ldp-input { display:flex; align-items:center; gap:7px; padding:8px 11px; border:1.5px solid var(--gray-300); border-radius:6px; background:#fff; cursor:pointer; transition:border-color .15s; user-select:none; font-size:14.5px; color:var(--gray-800); }
+  .ldp-input:hover { border-color:var(--green-light); }
+  .ldp-input.open { border-color:var(--green-light); box-shadow:0 0 0 3px rgba(82,183,136,.12); }
+  .ldp-input svg.ldp-icon { width:15px; height:15px; color:var(--green-main); flex-shrink:0; }
+  .ldp-text { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ldp-text.ph { color:var(--gray-500); }
+  .ldp-clear { display:flex; align-items:center; justify-content:center; width:18px; height:18px; border:none; background:transparent; color:#aaa; cursor:pointer; border-radius:50%; padding:0; transition:color .15s; flex-shrink:0; }
+  .ldp-clear:hover { color:#c0392b; }
+  .ldp-cal { position:absolute; top:calc(100% + 5px); left:0; z-index:500; background:#fff; border:1.5px solid var(--gray-300); border-radius:10px; box-shadow:0 8px 28px rgba(0,0,0,.13); padding:12px 10px 0; width:290px; animation:ldpAppear .13s ease; }
+  @keyframes ldpAppear{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+  .ldp-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .ldp-title { font-size:14px; font-weight:700; color:var(--green-dark); }
+  .ldp-nav { display:flex; align-items:center; justify-content:center; width:27px; height:27px; border:1px solid var(--gray-300); border-radius:5px; background:transparent; cursor:pointer; color:var(--green-dark); transition:background .12s; }
+  .ldp-nav:hover { background:var(--green-pale); border-color:var(--green-light); }
+  .ldp-wds { display:grid; grid-template-columns:repeat(7,1fr); margin-bottom:3px; }
+  .ldp-wds span { text-align:center; font-size:10px; font-weight:700; color:#999; padding:3px 0; }
+  .ldp-wds .sun { color:#e05c00; }
+  .ldp-days { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; }
+  .ldp-day { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:3px 1px; border-radius:5px; cursor:pointer; min-height:38px; transition:background .1s; }
+  .ldp-day:hover:not(.ldp-other) { background:#d0edda; }
+  .ldp-day.ldp-other { opacity:.28; pointer-events:none; }
+  .ldp-day .ldp-sol { font-size:12.5px; font-weight:700; color:#333; line-height:1.2; }
+  .ldp-day .ldp-lun { font-size:9.5px; color:#999; line-height:1.2; margin-top:1px; }
+  .ldp-day.ldp-today:not(.ldp-sel) .ldp-sol { color:#f97316; font-weight:800; }
+  .ldp-day.ldp-sel { background:var(--green-main) !important; border-radius:5px; }
+  .ldp-day.ldp-sel .ldp-sol { color:#fff; font-weight:800; }
+  .ldp-day.ldp-sel .ldp-lun { color:rgba(255,255,255,.8); }
+  .ldp-day.ldp-sun:not(.ldp-sel) .ldp-sol { color:#e05c00; }
+  .ldp-day.ldp-sat:not(.ldp-sel) .ldp-sol { color:var(--green-dark); }
+  .ldp-foot { margin-top:8px; padding:8px 2px 10px; border-top:1px solid var(--gray-200); font-size:11.5px; color:var(--green-mid); font-weight:600; text-align:center; min-height:28px; }
+
+  ::-webkit-scrollbar { width:5px; height:5px; }
+  ::-webkit-scrollbar-thumb { background:var(--gray-300); border-radius:3px; }
+
+  /* Mobile toggles — ẩn trên desktop */
+  .mobile-toggles { display: none; }
+
+  /* ============================================================
+     RESPONSIVE — MOBILE
+     ============================================================ */
+
+  /* Tablet: ẩn nav + datetime */
+  @media (max-width: 960px) {
+    .topbar-nav { display: none; }
+    .topbar-datetime { display: none; }
+    .topbar-brand { border-right: none; padding-right: 0; }
+  }
+
+  /* Mobile: ≤ 768px */
+  @media (max-width: 768px) {
+
+    /* --- TOPBAR --- */
+    .topbar {
+      height: auto;
+      padding: 8px 12px;
+      flex-wrap: wrap;
+      gap: 0;
+      row-gap: 0;
+    }
+    .topbar-brand { padding-right: 0; border-right: none; }
+    .app-name { font-size: 15px; }
+    .user-block {
+      margin-left: auto;
+      padding-left: 10px;
+      border-left: 1.5px solid var(--tb-sep);
+    }
+    .user-info { display: none; }
+    .topbar-actions {
+      width: 100%;
+      margin-left: 0;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 7px 0 5px;
+      border-top: 1px solid var(--tb-sep);
+      margin-top: 6px;
+    }
+    .tb-action { font-size: 12.5px; padding: 6px 11px; }
+
+    /* --- CONTENT --- */
+    .content { padding: 10px 10px; }
+
+    /* --- BAN FILTER BAR --- */
+    .ban-filter-top { padding: 12px 14px 10px; gap: 8px; }
+    .ban-info h2 { font-size: 18px; }
+    .ban-info .meta { font-size: 13px; }
+    .ban-filter-sep { display: none; }
+    .filter-controls {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      gap: 6px;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+    .search-wrap { flex-shrink: 0; }
+    .search-wrap input { width: 130px; }
+    .dd-wrap { flex-shrink: 0; }
+    .dd-btn { min-width: 140px !important; font-size: 13px; padding: 7px 11px; }
+
+    /* --- STATUS LEGEND --- */
+    .status-legend {
+      gap: 8px;
+      padding: 10px 14px;
+      flex-wrap: wrap;
+    }
+    .legend-title { font-size: 12.5px; }
+    .legend-item { font-size: 13px; }
+    .ld-sep { display: none; }
+    /* ── CHANGE 3: Ẩn toggle khỏi legend bar trên mobile ── */
+    .legend-spacer { display: none; }
+    .status-toggle-wrap { display: none; }
+
+    /* --- TABLE → CARD LAYOUT --- */
+    .table-wrap { border-radius: var(--radius); overflow: hidden; }
+
+    /* Turn table into block stacks */
+    .task-table,
+    .task-table thead,
+    .task-table tbody,
+    .task-table th,
+    .task-table td,
+    .task-table tr { display: block !important; width: 100% !important; box-sizing: border-box; }
+
+    .task-table colgroup { display: none; }
+    .task-table thead { display: none !important; }
+
+    .task-table tbody tr {
+      padding: 16px 14px !important;
+      border-bottom: 3px solid #dff0e7 !important;
+      background: white !important;
+      margin: 0;
+    }
+    .task-table tbody tr:hover { background: #f5fbf7 !important; }
+    .task-table tbody tr:last-child { border-bottom: none !important; }
+
+    /* Cột 1: luôn hiển thị */
+    .task-table td:nth-child(1) {
+      padding: 0 !important;
+      border-right: none !important;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* Cột 2 & 3: ẩn theo mặc định, hiện khi có class .m-open */
+    .task-table td:nth-child(2),
+    .task-table td:nth-child(3) {
+      display: none !important;
+      padding: 0 !important;
+      border-right: none !important;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .task-table td:nth-child(2).m-open,
+    .task-table td:nth-child(3).m-open {
+      display: block !important;
+      margin-top: 12px;
+      padding-top: 12px !important;
+      border-top: 1.5px dashed #c4dece !important;
+      animation: mFadeIn .2s ease;
+    }
+    @keyframes mFadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+
+    /* Label khi mở */
+    .task-table:not(.out-table) td:nth-child(2).m-open::before {
+      content: '💬 Ý Kiến Ban Phối Hợp';
+      display: block; font-size: 11px; font-weight: 700; color: var(--green-mid);
+      text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px;
+    }
+    .task-table:not(.out-table) td:nth-child(3).m-open::before {
+      content: '🙏 Sư Phụ / BLĐ Chỉ Dạy';
+      display: block; font-size: 11px; font-weight: 700; color: var(--burgundy);
+      text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px;
+    }
+    .out-table td:nth-child(2).m-open::before {
+      content: '🏛 Ban Được Giao';
+      display: block; font-size: 11px; font-weight: 700; color: var(--green-mid);
+      text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px;
+    }
+    .out-table td:nth-child(3).m-open::before {
+      content: '📊 Tiến Độ & Báo Cáo';
+      display: block; font-size: 11px; font-weight: 700; color: var(--burgundy);
+      text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px;
+    }
+
+    /* --- MOBILE TOGGLE BUTTONS --- */
+    .mobile-toggles {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-top: 13px;
+      padding-top: 11px;
+      border-top: 1px solid #e8f2eb;
+    }
+    .mtoggle {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 13px;
+      border-radius: 20px;
+      border: 1.5px solid var(--gray-300);
+      background: var(--gray-100);
+      font-family: inherit; font-size: 13.5px; font-weight: 700;
+      color: var(--gray-600); cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .mtoggle:hover { border-color: var(--green-light); background: var(--green-pale); color: var(--green-dark); }
+    .mtoggle.active {
+      border-color: var(--green-main);
+      background: var(--green-pale);
+      color: var(--green-dark);
+    }
+    .mtoggle.active .mtoggle-arrow { transform: rotate(180deg); }
+    .mtoggle-count {
+      background: var(--green-main); color: white;
+      border-radius: 10px; font-size: 11px; font-weight: 800;
+      padding: 1px 6px; min-width: 18px; text-align: center; line-height: 16px;
+    }
+    .mtoggle.active .mtoggle-count { background: var(--green-dark); }
+    .mtoggle-arrow { font-size: 9px; transition: transform .2s; display: inline-block; }
+
+    /* Task cell sizes */
+    .task-name { font-size: 17px; }
+    .task-detail-txt { font-size: 14px; }
+    .task-time { font-size: 14px; }
+    .task-footer { flex-wrap: wrap; gap: 6px; }
+
+    /* Opinion sizes */
+    .opinion-block { font-size: 15px; }
+    .op-author { font-size: 14px; flex-wrap: wrap; gap: 5px; }
+    .op-time { font-size: 14px; }
+    .author-tag { font-size: 14px; }
+    .op-actions { flex-wrap: wrap; gap: 6px; }
+    .op-like-btn, .op-edit-btn { font-size: 14px; padding: 5px 11px; }
+
+    /* Dropdown menus on mobile: prevent overflow */
+    .dd-menu { min-width: 200px !important; max-width: 90vw; }
+    .dd-menu[style*="min-width:270px"], .dd-menu[style*="min-width: 270px"] { min-width: 260px !important; }
+
+    /* LDP calendar width */
+    .ldp-cal { width: 260px; }
+
+    /* Progress bar */
+    .assigned-ban { font-size: 15px; }
+    .assigned-note { font-size: 13px; }
+    .progress-pct { font-size: 14px; }
+
+    /* Pagination */
+    .bottom-bar { padding: 14px 0 8px; }
+    .pg-info { font-size: 14px; }
+    .pagination { flex-wrap: wrap; gap: 4px; }
+    .pg-btn { min-width: 36px; height: 36px; font-size: 14px; padding: 0 7px; }
+  }
+
+  /* Extra small: ≤ 480px */
+  @media (max-width: 480px) {
+    .likes-popup { min-width: 170px; max-width: 80vw; }
+  }
+
+  /* ============================================================
+     MOBILE-ONLY NEW ELEMENTS (hidden on desktop)
+     ============================================================ */
+
+  .chi-tiet-mob { display: none; }
+  .chi-tiet-desk { display: inline-flex; }
+  .mob-topbar { display: none; }
+  .mob-content-hdr { display: none; }
+  .mob-search-bar { display: none; }
+  .mob-bottom-nav { display: none; }
+  .filter-sheet-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 600; }
+  .filter-sheet-overlay.open { display: block; }
+  .filter-sheet {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 700;
+    background: white; border-radius: 20px 20px 0 0;
+    padding: 0; max-height: 88vh;
+    transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1);
+    display: flex; flex-direction: column;
+    box-shadow: 0 -4px 30px rgba(0,0,0,.18);
+  }
+  .filter-sheet.open { transform: translateY(0); }
+  .fs-handle { width: 36px; height: 4px; border-radius: 2px; background: #ddd; margin: 12px auto 0; flex-shrink:0; }
+  .fs-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 10px; flex-shrink:0; border-bottom: 1px solid var(--gray-200); }
+  .fs-title { font-size: 16px; font-weight: 800; color: var(--green-dark); }
+  .fs-close { width: 32px; height: 32px; border-radius: 50%; background: var(--gray-100); border: none; font-size: 18px; cursor: pointer; display:flex; align-items:center; justify-content:center; color: var(--gray-600); }
+  .fs-body { overflow-y: auto; padding: 14px 18px; flex: 1; }
+  .fs-section { margin-bottom: 18px; }
+  .fs-section-title { font-size: 11px; font-weight: 800; color: var(--gray-500); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 9px; }
+  .fs-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .fs-chip {
+    padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--gray-300);
+    background: var(--gray-100); font-family: inherit; font-size: 14px; font-weight: 600;
+    color: var(--gray-600); cursor: pointer; transition: all .15s; white-space: nowrap;
+  }
+  /* ── CHANGE 1 (mobile): chip active = cam ── */
+  .fs-chip:hover { border-color: #FD8A02; color: #c96800; background: #fff5ea; }
+  .fs-chip.active { background: #FD8A02; border-color: #FD8A02; color: white; }
+  .fs-search { display: flex; align-items: center; gap: 8px; background: var(--gray-100); border: 1.5px solid var(--gray-300); border-radius: 10px; padding: 9px 14px; }
+  .fs-search:focus-within { border-color: #FD8A02; background: white; }
+  .fs-search svg { width: 15px; height: 15px; color: var(--gray-500); flex-shrink: 0; }
+  .fs-search input { border: none; background: transparent; font-family: inherit; font-size: 15px; outline: none; flex: 1; color: var(--gray-800); }
+  .fs-search input::placeholder { color: var(--gray-500); }
+  .fs-footer { display: flex; gap: 10px; padding: 12px 18px 20px; flex-shrink: 0; border-top: 1px solid var(--gray-200); }
+  .fs-reset { flex: 1; padding: 12px; border: 1.5px solid var(--gray-300); background: white; border-radius: 10px; font-family: inherit; font-size: 15px; font-weight: 700; color: var(--gray-600); cursor: pointer; }
+  .fs-apply { flex: 2; padding: 12px; background: #FD8A02; border: none; border-radius: 10px; font-family: inherit; font-size: 15px; font-weight: 800; color: white; cursor: pointer; }
+  .fs-apply:hover { background: #e07a00; }
+  .fs-ban-list { display: flex; flex-wrap: wrap; gap: 7px; max-height: 120px; overflow-y: auto; }
+
+  @media (max-width: 768px) {
+    /* Hide desktop topbar & filter bar */
+    .topbar { display: none !important; }
+    .ban-filter-bar { display: none !important; }
+
+    /* Show mobile topbar */
+    .mob-topbar {
+      display: flex; align-items: center;
+      background: #FD8A02;
+      padding: 0 14px;
+      height: 58px; position: sticky; top: 0; z-index: 200;
+      box-shadow: 0 2px 8px rgba(200,80,0,.2);
+      gap: 10px;
+    }
+    .mob-topbar-back {
+      width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.22);
+      border: none; color: white; font-size: 20px; display: flex; align-items: center;
+      justify-content: center; cursor: pointer; flex-shrink: 0;
+    }
+    .mob-topbar-info { flex: 1; min-width: 0; }
+    /* ── CHANGE 4: chữ trắng rõ ràng ── */
+    .mob-topbar-title { font-size: 17px; font-weight: 800; color: white; line-height: 1.2; }
+    .mob-topbar-sub { font-size: 12px; color: rgba(255,255,255,.9); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mob-topbar-filter {
+      width: 38px; height: 38px; border-radius: 10px; background: rgba(255,255,255,.22);
+      border: none; color: white; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; font-size: 18px; position: relative;
+    }
+    .mob-filter-badge {
+      position: absolute; top: -3px; right: -3px; width: 16px; height: 16px;
+      background: #c0392b; border-radius: 50%; font-size: 10px; font-weight: 800;
+      color: white; display: none; align-items: center; justify-content: center;
+    }
+    .mob-filter-badge.show { display: flex; }
+
+    /* Content padding */
+    .content { padding: 0 0 80px !important; }
+
+    /* Mobile content header */
+    .mob-content-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px 10px; background: white;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .mob-content-hdr-title { font-size: 17px; font-weight: 800; color: var(--green-dark); }
+    .mob-add-btn {
+      width: 38px; height: 38px; background: #FD8A02; border: none; border-radius: 10px;
+      color: white; font-size: 22px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      line-height: 1;
+    }
+
+    /* Mobile search bar */
+    .mob-search-bar {
+      display: flex; align-items: center; gap: 8px;
+      background: white; padding: 8px 16px 12px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .mob-search-inner {
+      flex: 1; display: flex; align-items: center; gap: 8px;
+      background: var(--gray-100); border: 1.5px solid var(--gray-300);
+      border-radius: 22px; padding: 8px 14px;
+    }
+    .mob-search-inner:focus-within { border-color: #FD8A02; background: white; }
+    .mob-search-inner svg { width: 15px; height: 15px; color: var(--gray-500); flex-shrink:0; }
+    .mob-search-inner input { border: none; background: transparent; font-family: inherit; font-size: 15px; outline: none; flex: 1; }
+
+    /* Status legend on mobile */
+    .status-legend {
+      border-radius: 0 !important;
+      border-left: none !important; border-right: none !important;
+      margin-bottom: 0 !important;
+      padding: 10px 16px;
+      gap: 10px;
+    }
+    .ld-sep { display: none; }
+    /* toggle ẩn trên mobile (nằm trong filter sheet) */
+    .legend-spacer { display: none; }
+    .status-toggle-wrap { display: none; }
+
+    /* Chi tiết: show in task-header, hide in task-footer on mobile */
+    .chi-tiet-mob {
+      display: inline-flex; align-items: center;
+      margin-left: auto; flex-shrink: 0;
+      font-size: 13px; font-weight: 700; color: #FD8A02;
+      padding: 5px 12px; border: 1.5px solid #FD8A02;
+      border-radius: 7px; text-decoration: none; cursor: pointer;
+      white-space: nowrap;
+    }
+    .chi-tiet-desk { display: none !important; }
+    .task-footer { margin-top: 8px; }
+
+    /* Table as cards */
+    .table-wrap { border-radius: 0 !important; box-shadow: none !important; }
+    .task-table tbody tr { padding: 14px 16px !important; }
+
+    /* Bottom nav */
+    .mob-bottom-nav {
+      display: flex; align-items: center;
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
+      background: white; border-top: 1px solid var(--gray-200);
+      height: 62px;
+      box-shadow: 0 -2px 12px rgba(0,0,0,.08);
+    }
+    .mob-nav-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 3px; cursor: pointer;
+      font-size: 11px; font-weight: 700; color: var(--gray-500);
+      padding: 6px 0; transition: color .15s;
+    }
+    .mob-nav-item.active { color: #FD8A02; }
+    .mob-nav-icon { font-size: 22px; line-height: 1; }
+
+    /* ── CHANGE 5: Avatar "Hồ Sơ" bottom nav ── */
+    .mob-nav-profile-avatar {
+      width: 26px; height: 26px;
+      background: var(--burgundy);
+      color: #c9a84c;
+      border-radius: 7px;
+      font-weight: 800; font-size: 11px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- MOBILE TOPBAR -->
+<div class="mob-topbar">
+  <button class="mob-topbar-back">‹</button>
+  <div class="mob-topbar-info">
+    <div class="mob-topbar-title">Ban Tri Sự</div>
+    <div class="mob-topbar-sub">Trưởng Ban: Phan Tuấn Anh · 0123 456 788</div>
+  </div>
+  <button class="mob-topbar-filter" onclick="openFilterSheet()">
+    <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M3 5h18M7 12h10M11 19h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="mob-filter-badge" id="mobFilterBadge">0</span>
+  </button>
+</div>
+
+<!-- FILTER SHEET OVERLAY -->
+<div class="filter-sheet-overlay" id="filterSheetOverlay" onclick="closeFilterSheet()"></div>
+
+<!-- FILTER SHEET -->
+<div class="filter-sheet" id="filterSheet">
+  <div class="fs-handle"></div>
+  <div class="fs-header">
+    <span class="fs-title">🔍 Bộ lọc & Tìm kiếm</span>
+    <button class="fs-close" onclick="closeFilterSheet()">✕</button>
+  </div>
+  <div class="fs-body">
+    <!-- Search -->
+    <div class="fs-section">
+      <div class="fs-section-title">Tìm kiếm</div>
+      <div class="fs-search">
+        <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input type="text" id="mobKeywordInput" placeholder="Tên việc, nội dung...">
+      </div>
+    </div>
+    <!-- Sắp xếp -->
+    <div class="fs-section">
+      <div class="fs-section-title">Sắp xếp theo</div>
+      <div class="fs-chips">
+        <button class="fs-chip active" data-filter="sort" data-val="deadline" onclick="fsTap(this)">📅 Ngày hạn</button>
+        <button class="fs-chip" data-filter="sort" data-val="name" onclick="fsTap(this)">🔤 Tên A→Z</button>
+        <button class="fs-chip" data-filter="sort" data-val="status" onclick="fsTap(this)">🔴 Ưu tiên</button>
+      </div>
+    </div>
+    <!-- Trạng thái -->
+    <div class="fs-section">
+      <div class="fs-section-title">Trạng thái</div>
+      <div class="fs-chips">
+        <button class="fs-chip active" data-filter="status" data-val="all" onclick="fsTap(this)">Tất cả</button>
+        <button class="fs-chip" data-filter="status" data-val="urgent" onclick="fsTap(this)">🔴 Khẩn Cấp</button>
+        <button class="fs-chip" data-filter="status" data-val="important" onclick="fsTap(this)">🟠 Quan Trọng</button>
+        <button class="fs-chip" data-filter="status" data-val="waiting" onclick="fsTap(this)">🟡 Xin Chỉ Dạy</button>
+        <button class="fs-chip" data-filter="status" data-val="normal" onclick="fsTap(this)">🟢 Bình Thường</button>
+      </div>
+    </div>
+    <!-- ── CHANGE 3: Tiến độ (Đang làm / Hoàn thành) trong filter sheet ── -->
+    <div class="fs-section">
+      <div class="fs-section-title">Tiến độ</div>
+      <div class="fs-chips">
+        <button class="fs-chip active" data-filter="progress" data-val="active" onclick="fsTap(this)">⚡ Đang làm</button>
+        <button class="fs-chip" data-filter="progress" data-val="done" onclick="fsTap(this)">✅ Hoàn thành</button>
+      </div>
+    </div>
+    <!-- Thời gian -->
+    <div class="fs-section">
+      <div class="fs-section-title">Thời gian</div>
+      <div class="fs-chips">
+        <button class="fs-chip active" data-filter="date" data-val="all" onclick="fsTap(this)">Tất cả</button>
+        <button class="fs-chip" data-filter="date" data-val="yesterday" onclick="fsTap(this)">Hôm qua</button>
+        <button class="fs-chip" data-filter="date" data-val="today" onclick="fsTap(this)">Hôm nay</button>
+        <button class="fs-chip" data-filter="date" data-val="tomorrow" onclick="fsTap(this)">Ngày mai</button>
+        <button class="fs-chip" data-filter="date" data-val="week" onclick="fsTap(this)">7 ngày tới</button>
+      </div>
+    </div>
+    <!-- Loại công việc -->
+    <div class="fs-section">
+      <div class="fs-section-title">Loại công việc</div>
+      <div class="fs-chips">
+        <button class="fs-chip active" data-filter="loai" data-val="phoi-hop" onclick="fsTap(this)">🤝 Phối hợp</button>
+        <button class="fs-chip" data-filter="loai" data-val="bts" onclick="fsTap(this)">🏛️ BTS</button>
+        <button class="fs-chip" data-filter="loai" data-val="giao-di" onclick="fsTap(this)">📋 Giao đi</button>
+      </div>
+    </div>
+    <!-- Các ban -->
+    <div class="fs-section">
+      <div class="fs-section-title">Các ban</div>
+      <div class="fs-chips fs-ban-list" id="fsBanList">
+        <button class="fs-chip active" data-filter="ban" data-val="all" onclick="fsTap(this)">Tất cả</button>
+      </div>
+    </div>
+  </div>
+  <div class="fs-footer">
+    <button class="fs-reset" onclick="fsReset()">↺ Đặt lại</button>
+    <button class="fs-apply" onclick="fsApply()">Tìm kiếm</button>
+  </div>
+</div>
+
+<!-- DESKTOP TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="logo-icon">
+      <svg viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg" width="36" height="36">
+        <rect width="42" height="42" rx="8" fill="#7a3a00"/>
+        <rect x="12" y="26" width="18" height="10" fill="#fad96a"/>
+        <rect x="18" y="28" width="6" height="8" rx="1" fill="#7a3a00"/>
+        <polygon points="6,26 21,17 36,26" fill="#fad96a"/>
+        <polygon points="12,19 21,12 30,19" fill="#f0d080"/>
+        <polygon points="18,12 21,6 24,12" fill="#ffffff"/>
+        <rect x="13" y="26" width="2" height="10" fill="#c9a84c"/>
+        <rect x="27" y="26" width="2" height="10" fill="#c9a84c"/>
+      </svg>
+    </div>
+    <span class="app-name">Quản Lý Công Việc</span>
+  </div>
+  <div class="topbar-datetime">
+    <span class="dt-duong" id="dtDuong"></span>
+    <span class="dt-am" id="dtAm"></span>
+  </div>
+  <div class="topbar-nav">
+    <div class="topbar-nav-item active">🏠 Trang Chủ</div>
+  </div>
+  <div class="topbar-actions">
+    <button class="tb-action">📢 Thông Báo Toàn Chùa</button>
+    <button class="tb-action">+ Đề Xuất</button>
+    <button class="tb-action primary">+ Thêm Việc</button>
+    <div class="user-block">
+      <div class="avatar">PA</div>
+      <div class="user-info">
+        <span class="user-name">Phan Tuấn Anh</span>
+        <span class="user-role">Ban Tri Sự · Trưởng Ban</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- BAN HEADER + FILTER -->
+  <div class="ban-filter-bar">
+    <div class="ban-filter-top">
+      <div class="ban-info">
+        <h2>Ban Tri Sự</h2>
+        <div class="meta">Trưởng Ban: <span>Phan Tuấn Anh</span> &nbsp;·&nbsp; <span>0123 456 788</span></div>
+      </div>
+      <div class="ban-filter-sep"></div>
+      <div class="filter-controls">
+        <div class="search-wrap">
+          <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <input type="text" id="keywordInput" placeholder="Tên việc, nội dung..." oninput="applyFilters()">
+        </div>
+
+        <!-- Status -->
+        <div class="dd-wrap" id="dd-status">
+          <button class="dd-btn" onclick="toggleDD('dd-status')">
+            <span class="dd-left" id="status-label"><span style="width:10px;height:10px;border-radius:50%;background:#adb5bd;display:inline-block;"></span> Tất cả trạng thái</span>
+            <span class="dd-arrow">▼</span>
+          </button>
+          <div class="dd-menu" id="dd-status-menu">
+            <div class="dd-opt selected" onclick="selectStatus('all',this)"><span style="width:10px;height:10px;border-radius:50%;background:#adb5bd;display:inline-block;"></span> Tất cả</div>
+            <div class="dd-opt" onclick="selectStatus('urgent',this)"><span style="width:10px;height:10px;border-radius:50%;background:#c0392b;display:inline-block;"></span> Khẩn Cấp</div>
+            <div class="dd-opt" onclick="selectStatus('important',this)"><span style="width:10px;height:10px;border-radius:50%;background:#e07b39;display:inline-block;"></span> Quan Trọng</div>
+            <div class="dd-opt" onclick="selectStatus('waiting',this)"><span style="width:10px;height:10px;border-radius:50%;background:#c9a84c;display:inline-block;"></span> Xin Chỉ Dạy</div>
+            <div class="dd-opt" onclick="selectStatus('normal',this)"><span style="width:10px;height:10px;border-radius:50%;background:#2d6a4f;display:inline-block;"></span> Bình Thường</div>
+          </div>
+        </div>
+
+        <!-- Sắp xếp theo -->
+        <div class="dd-wrap" id="dd-sort">
+          <button class="dd-btn" style="min-width:180px;" onclick="toggleDD('dd-sort')">
+            <span class="dd-left" id="sort-label">📊 Sắp xếp theo: Hạn</span>
+            <span class="dd-arrow">▼</span>
+          </button>
+          <div class="dd-menu" id="dd-sort-menu" style="min-width:220px;">
+            <div class="dd-opt selected" onclick="selectSort('deadline',this)">📅 Ngày hạn (gần nhất)</div>
+            <div class="dd-opt" onclick="selectSort('name',this)">🔤 Tên công việc (A→Z)</div>
+            <div class="dd-opt" onclick="selectSort('status',this)">🔴 Độ ưu tiên</div>
+          </div>
+        </div>
+
+        <!-- Date filter -->
+        <div class="dd-wrap" id="dd-date">
+          <button class="dd-btn" style="min-width:180px;" onclick="toggleDD('dd-date')">
+            <span class="dd-left" id="date-label">📅 Tất cả thời gian</span>
+            <span class="dd-arrow">▼</span>
+          </button>
+          <div class="dd-menu" id="dd-date-menu" style="min-width:270px;">
+            <div class="dd-opt selected" onclick="selectDate('all',this)">Tất cả thời gian</div>
+            <div class="dd-opt" onclick="selectDate('yesterday',this)">Hôm qua</div>
+            <div class="dd-opt" onclick="selectDate('today',this)">Hôm nay</div>
+            <div class="dd-opt" onclick="selectDate('tomorrow',this)">Ngày mai</div>
+            <div class="dd-opt" onclick="selectDate('week',this)">7 ngày tới</div>
+            <hr class="dd-sep">
+            <div class="dd-opt" onclick="selectDate('custom',this)">Tùy chọn khoảng thời gian…</div>
+            <div id="date-range-row" style="display:none;">
+              <div class="date-range-row">
+                <div class="dr-group">
+                  <label>Từ ngày</label>
+                  <div class="ldp-wrap" id="ldpFrom">
+                    <div class="ldp-input" id="ldpFromInput" onclick="toggleLdp('From')">
+                      <svg class="ldp-icon" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 2v4M13 2v4M3 9h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                      <span class="ldp-text ph" id="ldpFromText">Chọn ngày...</span>
+                      <button class="ldp-clear" id="ldpFromClear" style="display:none" onclick="clearLdp(event,'From')">
+                        <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                      </button>
+                    </div>
+                    <div class="ldp-cal" id="ldpFromCal" style="display:none">
+                      <div class="ldp-hdr">
+                        <button class="ldp-nav" onclick="ldpPrev('From')"><svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                        <span class="ldp-title" id="ldpFromTitle"></span>
+                        <button class="ldp-nav" onclick="ldpNext('From')"><svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                      </div>
+                      <div class="ldp-wds"><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span class="sun">CN</span></div>
+                      <div class="ldp-days" id="ldpFromDays"></div>
+                      <div class="ldp-foot" id="ldpFromFoot"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="dr-group">
+                  <label>Đến ngày</label>
+                  <div class="ldp-wrap" id="ldpTo">
+                    <div class="ldp-input" id="ldpToInput" onclick="toggleLdp('To')">
+                      <svg class="ldp-icon" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 2v4M13 2v4M3 9h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                      <span class="ldp-text ph" id="ldpToText">Chọn ngày...</span>
+                      <button class="ldp-clear" id="ldpToClear" style="display:none" onclick="clearLdp(event,'To')">
+                        <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                      </button>
+                    </div>
+                    <div class="ldp-cal" id="ldpToCal" style="display:none">
+                      <div class="ldp-hdr">
+                        <button class="ldp-nav" onclick="ldpPrev('To')"><svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                        <span class="ldp-title" id="ldpToTitle"></span>
+                        <button class="ldp-nav" onclick="ldpNext('To')"><svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                      </div>
+                      <div class="ldp-wds"><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span class="sun">CN</span></div>
+                      <div class="ldp-days" id="ldpToDays"></div>
+                      <div class="ldp-foot" id="ldpToFoot"></div>
+                    </div>
+                  </div>
+                </div>
+                <button class="dr-apply" onclick="applyDateRange()">✓ Áp dụng</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loại công việc -->
+        <div class="dd-wrap" id="dd-loai">
+          <button class="dd-btn" style="min-width:220px;" onclick="toggleDD('dd-loai')">
+            <span class="dd-left" id="loai-label">🤝 Các ban phối hợp</span>
+            <span class="dd-arrow">▼</span>
+          </button>
+          <div class="dd-menu" id="dd-loai-menu" style="min-width:280px;">
+            <div class="dd-opt selected" onclick="selectLoai('phoi-hop',this)">🤝 Các ban phối hợp</div>
+            <div class="dd-opt" onclick="selectLoai('bts',this)">🏛️ Công việc của BTS</div>
+            <div class="dd-opt" onclick="selectLoai('giao-di',this)">📋 Công việc BTS giao cho các ban</div>
+          </div>
+        </div>
+
+        <!-- Ban filter -->
+        <div class="dd-wrap" id="dd-ban">
+          <button class="dd-btn" style="min-width:180px;" onclick="toggleDD('dd-ban')">
+            <span class="dd-left" id="ban-label">🤝 Tất cả ban</span>
+            <span class="dd-arrow">▼</span>
+          </button>
+          <div class="dd-menu" id="dd-ban-menu" style="min-width:230px;max-height:320px;overflow-y:auto;">
+            <div class="dd-opt selected" onclick="selectBan('all',this)">Tất cả ban</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE CONTENT HEADER -->
+  <div class="mob-content-hdr">
+    <span class="mob-content-hdr-title">Đầu mục công việc</span>
+    <button class="mob-add-btn">+</button>
+  </div>
+  <div class="mob-search-bar">
+    <div class="mob-search-inner">
+      <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <input type="text" id="mobSearchInline" placeholder="Tên việc, nội dung..." oninput="syncMobSearch(this.value)">
+    </div>
+  </div>
+
+  <!-- STATUS LEGEND BAR -->
+  <div class="status-legend">
+    <span class="legend-title">Trạng thái:</span>
+    <div class="legend-item"><span class="legend-dot ld-urgent"></span> Khẩn Cấp</div>
+    <div class="ld-sep"></div>
+    <div class="legend-item"><span class="legend-dot ld-important"></span> Quan Trọng</div>
+    <div class="ld-sep"></div>
+    <div class="legend-item"><span class="legend-dot ld-waiting"></span> Xin Chỉ Dạy</div>
+    <div class="ld-sep"></div>
+    <div class="legend-item"><span class="legend-dot ld-normal"></span> Bình Thường</div>
+    <div class="legend-spacer"></div>
+    <!-- Desktop: toggle vẫn ở đây -->
+    <div class="status-toggle-wrap" id="statusToggleWrap">
+      <button class="status-toggle-btn active" id="stab-active" onclick="switchStatusTab('active')">⚡ Đang làm</button>
+      <button class="status-toggle-btn" id="stab-done" onclick="switchStatusTab('done')">✅ Hoàn thành</button>
+    </div>
+  </div>
+
+  <!-- PANEL: PHỐI HỢP / BTS -->
+  <div id="panel-main">
+    <div class="table-wrap">
+      <table class="task-table">
+        <colgroup><col class="c1"><col class="c2"><col class="c3"></colgroup>
+        <thead>
+          <tr>
+            <th>Đầu Mục Công Việc</th>
+            <th>Ý Kiến Ban Phối Hợp</th>
+            <th class="col-sp">Sư Phụ / BLĐ Chỉ Dạy</th>
+          </tr>
+        </thead>
+        <tbody id="taskBody"></tbody>
+      </table>
+    </div>
+    <div class="bottom-bar">
+      <div class="pg-info" id="pgInfo"></div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </div>
+
+  <!-- PANEL: GIAO ĐI -->
+  <div id="panel-giao-di" style="display:none;">
+    <div class="table-wrap">
+      <table class="task-table out-table">
+        <colgroup><col class="oc1"><col class="oc2"><col class="oc3"></colgroup>
+        <thead>
+          <tr>
+            <th>Nội Dung Công Việc</th>
+            <th>Ban Được Giao</th>
+            <th class="col-sp">Tiến Độ & Báo Cáo</th>
+          </tr>
+        </thead>
+        <tbody id="outTaskBody"></tbody>
+      </table>
+    </div>
+    <div class="bottom-bar">
+      <div class="pg-info" id="pgInfoOut"></div>
+      <div class="pagination" id="paginationOut"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="mob-bottom-nav">
+  <div class="mob-nav-item active">
+    <span class="mob-nav-icon">🏠</span>Trang chủ
+  </div>
+  <div class="mob-nav-item">
+    <span class="mob-nav-icon">🔔</span>Thông báo
+  </div>
+  <!-- ── CHANGE 5: Avatar PA chữ vàng nền burgundy ── -->
+  <div class="mob-nav-item">
+    <div class="mob-nav-profile-avatar">PA</div>
+    Hồ sơ
+  </div>
+</div>
+
+<script>
+/* ===== LUNAR TABLE ===== */
+const LUNAR_TABLE = {
+  '2026-04-18':{d:1,m:3},'2026-04-19':{d:2,m:3},'2026-04-20':{d:3,m:3},
+  '2026-04-21':{d:4,m:3},'2026-04-22':{d:5,m:3},'2026-04-23':{d:6,m:3},
+  '2026-04-24':{d:7,m:3},'2026-04-25':{d:8,m:3},'2026-04-26':{d:9,m:3},
+  '2026-04-27':{d:10,m:3},'2026-04-28':{d:11,m:3},'2026-04-29':{d:12,m:3},
+  '2026-04-30':{d:13,m:3},'2026-05-01':{d:14,m:3},'2026-05-02':{d:15,m:3},
+  '2026-05-03':{d:16,m:3},'2026-05-04':{d:17,m:3},'2026-05-05':{d:18,m:3},
+  '2026-05-06':{d:19,m:3},'2026-05-07':{d:20,m:3},'2026-05-08':{d:21,m:3},
+  '2026-05-09':{d:22,m:3},'2026-05-10':{d:23,m:3},'2026-05-11':{d:24,m:3},
+  '2026-05-12':{d:25,m:3},'2026-05-13':{d:26,m:3},'2026-05-14':{d:27,m:3},
+  '2026-05-15':{d:28,m:3},'2026-05-16':{d:29,m:3},'2026-05-17':{d:1,m:4},
+  '2026-05-18':{d:2,m:4},'2026-05-19':{d:3,m:4},'2026-05-20':{d:4,m:4},
+};
+const THU=['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
+
+function isoKey(d){ return d.toISOString().split('T')[0]; }
+function toAL(ddmmyyyy){
+  if(!ddmmyyyy) return '';
+  const p=ddmmyyyy.trim().split('/');
+  if(p.length<3) return ddmmyyyy;
+  const k=`${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+  const al=LUNAR_TABLE[k];
+  return al ? `${al.d}/${al.m}/ÂL` : ddmmyyyy;
+}
+function convertTimeRange(s){
+  if(!s) return '';
+  const mR=s.match(/(\d{2})\/(\d{2})\s*[→–-]\s*(\d{2})\/(\d{2})\/(\d{4})/);
+  if(mR){ const y=mR[5]; return `${toAL(mR[1]+'/'+mR[2]+'/'+y)} – ${toAL(mR[3]+'/'+mR[4]+'/'+y)}`; }
+  const mS=s.match(/(\d{2})\/(\d{2})\/(\d{4})(.*)/);
+  if(mS) return toAL(mS[1]+'/'+mS[2]+'/'+mS[3])+mS[4];
+  return s;
+}
+function convertOpDate(ds){
+  if(!ds) return '';
+  const m=ds.match(/(\d{2})\/(\d{2})\s*·\s*(\d{2}:\d{2})/);
+  if(m){ const lunStr=toAL(m[1]+'/'+m[2]+'/2026'); return `<span class="op-time">${m[3]} · ${lunStr}</span>`; }
+  const m2=ds.match(/(\d{2})\/(\d{2})\s*·\s*(.*)/);
+  if(m2) return `<span class="op-time">${toAL(m2[1]+'/'+m2[2]+'/2026')} · ${m2[3]}</span>`;
+  return ds;
+}
+
+function truncateWords(str, maxWords) {
+  if(!str) return '';
+  const words = str.trim().split(/\s+/);
+  if(words.length <= maxWords) return str;
+  return words.slice(0, maxWords).join(' ') + '…';
+}
+
+function truncate(str,len){
+  if(!str) return '';
+  if(str.length<=len) return str;
+  const cut=str.slice(0,len);
+  const ls=cut.lastIndexOf(' ');
+  return (ls>len*.6?cut.slice(0,ls):cut)+'…';
+}
+
+/* Solar → Lunar */
+function jdFromDate(d,m,y){const a=Math.floor((14-m)/12);const yy=y+4800-a;const mm=m+12*a-3;let jd=d+Math.floor((153*mm+2)/5)+365*yy+Math.floor(yy/4)-Math.floor(yy/100)+Math.floor(yy/400)-32045;if(jd<2299161)jd=d+Math.floor((153*mm+2)/5)+365*yy+Math.floor(yy/4)-32083;return jd;}
+function getNewMoonDay(k,tz){const T=k/1236.85;const T2=T*T;const T3=T2*T;const dr=Math.PI/180;let Jd1=2415020.75933+29.53058868*k+0.0001178*T2-0.000000155*T3;Jd1+=0.00033*Math.sin((166.56+132.87*T-0.009173*T2)*dr);const M=359.2242+29.10535608*k-0.0000333*T2-0.00000347*T3;const Mpr=306.0253+385.81691806*k+0.0107306*T2+0.00001236*T3;const F=21.2964+390.67050646*k-0.0016528*T2-0.00000239*T3;let C1=(0.1734-0.000393*T)*Math.sin(M*dr)+0.0021*Math.sin(2*dr*M);C1-=0.4068*Math.sin(Mpr*dr)+0.0161*Math.sin(2*dr*Mpr);C1-=0.0004*Math.sin(3*dr*Mpr);C1+=0.0104*Math.sin(2*dr*F)-0.0051*Math.sin((M+Mpr)*dr);C1-=0.0074*Math.sin((M-Mpr)*dr)+0.0004*Math.sin((2*F+M)*dr);C1-=0.0004*Math.sin((2*F-M)*dr)-0.0006*Math.sin((2*F+Mpr)*dr);C1+=0.001*Math.sin((2*F-Mpr)*dr)+0.0005*Math.sin((M+2*Mpr)*dr);let dt=T<-11?0.001+0.000839*T+0.0002261*T2-0.00000845*T3-0.000000081*T*T3:-0.000278+0.000265*T+0.000262*T2;return Math.floor(Jd1+C1-dt+0.5+tz/24);}
+function getSunLong(jdn,tz){const T=(jdn-2451545.5-tz/24)/36525;const T2=T*T;const dr=Math.PI/180;const M=357.5291+35999.0503*T-0.0001559*T2-0.00000048*T*T2;const L0=280.46645+36000.76983*T+0.0003032*T2;let DL=(1.9146-0.004817*T-0.000014*T2)*Math.sin(dr*M);DL+=(0.019993-0.000101*T)*Math.sin(dr*2*M)+0.00029*Math.sin(dr*3*M);let L=(L0+DL)*dr;L-=2*Math.PI*Math.floor(L/(2*Math.PI));return Math.floor(L/Math.PI*6);}
+function getLunarMonth11(y,tz){const off=jdFromDate(31,12,y)-2415021;const k=Math.floor(off/29.530588853);let nm=getNewMoonDay(k,tz);if(getSunLong(nm,tz)>=9)nm=getNewMoonDay(k-1,tz);return nm;}
+function getLeapOffset(a11,tz){const k=Math.floor((a11-2415021.076998695)/29.530588853+0.5);let last=0,i=1,arc=getSunLong(getNewMoonDay(k+i,tz),tz);do{last=arc;i++;arc=getSunLong(getNewMoonDay(k+i,tz),tz);}while(arc!==last&&i<14);return i-1;}
+function solar2Lunar(dd,mm,yy){
+  const tz=7;const jd=jdFromDate(dd,mm,yy);const k=Math.floor((jd-2415021.076998695)/29.530588853);
+  let ms=getNewMoonDay(k+1,tz);if(ms>jd)ms=getNewMoonDay(k,tz);
+  let a11=getLunarMonth11(yy,tz),b11=a11,ly;
+  if(a11>=ms){ly=yy;a11=getLunarMonth11(yy-1,tz);}else{ly=yy+1;b11=getLunarMonth11(yy+1,tz);}
+  const lday=jd-ms+1;const diff=Math.floor((ms-a11)/29);
+  let leap=0,lmonth=diff+11;
+  if(b11-a11>365){const lo=getLeapOffset(a11,tz);if(diff>=lo){lmonth=diff+10;if(diff===lo)leap=1;}}
+  if(lmonth>12)lmonth-=12;if(lmonth>=11&&diff<4)ly--;
+  return {day:lday,month:lmonth,year:ly,leap:leap===1};
+}
+
+/* ===== DATE HELPERS ===== */
+const TODAY=new Date(); TODAY.setHours(0,0,0,0);
+function parseDMY(str){
+  if(!str) return null;
+  const m=str.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+  if(!m) return null;
+  const d=new Date(+m[3],+m[2]-1,+m[1]); d.setHours(0,0,0,0);
+  return isNaN(d)?null:d;
+}
+function parseRange(task){
+  const s=task.time||'';
+  const mR=s.match(/(\d{2})\/(\d{2})\s*[→–-]\s*(\d{2})\/(\d{2})\/(\d{4})/);
+  if(mR){const yr=+mR[5];const st=new Date(yr,+mR[2]-1,+mR[1]);st.setHours(0,0,0,0);const en=new Date(yr,+mR[4]-1,+mR[3]);en.setHours(0,0,0,0);return{start:st,end:en};}
+  const mS=s.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+  if(mS){const d=new Date(+mS[3],+mS[2]-1,+mS[1]);d.setHours(0,0,0,0);return{start:d,end:d};}
+  const dl=parseDMY(task.deadline);
+  if(dl) return{start:dl,end:dl};
+  return null;
+}
+function relDate(n){const d=new Date(TODAY);d.setDate(TODAY.getDate()+n);return d;}
+function coversDay(task,day){const r=parseRange(task);if(!r)return false;return day>=r.start&&day<=r.end;}
+function overlaps(task,from,to){const r=parseRange(task);if(!r)return false;return r.start<=to&&r.end>=from;}
+function isTrulyOverdue(task){
+  if(task.tags&&task.tags.includes('done'))return false;
+  const r=parseRange(task);if(!r)return false;return r.end<TODAY;
+}
+function getStatusTag(task){
+  if(task.tags&&task.tags.includes('done'))       return 'done';
+  if(isTrulyOverdue(task))                        return 'normal';
+  if(task.tags&&task.tags.includes('urgent'))     return 'urgent';
+  if(task.tags&&task.tags.includes('waiting'))    return 'waiting';
+  if(task.tags&&task.tags.includes('important'))  return 'important';
+  return 'normal';
+}
+function getDotClass(t){
+  return{urgent:'dot-urgent',important:'dot-important',waiting:'dot-waiting',done:'dot-done',normal:'dot-normal'}[getStatusTag(t)]||'dot-normal';
+}
+function getDotColor(st){
+  return{urgent:'#c0392b',important:'#e07b39',waiting:'#c9a84c',done:'#27ae60',normal:'#2d6a4f'}[st]||'#2d6a4f';
+}
+
+/* ===== LIKE POPUP DATA ===== */
+const sampleLikers = {
+  'op1_1': ['Ban Tài Chính', 'Ban Hậu Cần', 'Ban Tri Sự'],
+  'op2_1': ['Ban Hướng Dẫn', 'Ban An Ninh', 'Ban Nghi Lễ', 'Ban Trang Trí', 'Ban Tri Sự'],
+  'op3_1': ['Ban Tri Sự', 'Ban Hướng Dẫn', 'Ban Nghi Lễ', 'Ban Ẩm Thực', 'Ban Hậu Cần', 'Ban Trang Trí'],
+  'op4_1': [],
+  'op5_1': ['Ban Tri Sự', 'Ban Vật Tư'],
+  'op6_1': ['Ban Tri Sự', 'Ban Nghi Lễ', 'Ban Vật Tư'],
+  'op7_1': ['Ban Truyền Thông', 'Ban Tri Sự'],
+  'op7_2': ['Ban Kỹ Thuật'],
+  'op8_1': ['Ban Tri Sự', 'Ban Nghi Lễ', 'Ban Vật Tư', 'Ban Ẩm Thực'],
+  'op9_1': ['Ban Tri Sự', 'Ban An Ninh', 'Ban Hướng Dẫn', 'Ban Hậu Cần'],
+  'op10_1': ['Ban Hậu Cần'],
+  'op10_2': ['Ban Ẩm Thực', 'Ban Tri Sự'],
+  'op11_1': ['Ban Truyền Thông', 'Ban Tri Sự'],
+  'op12_1': ['Ban Tri Sự', 'Ban Tăng Chúng', 'Ban Vật Tư', 'Ban Hướng Dẫn', 'Ban An Ninh', 'Ban Nghi Lễ', 'Ban Trang Trí'],
+  'op13_1': [],
+  'op14_1': ['Ban Tri Sự'],
+  'op15_1': [],
+  'op16_1': ['Ban Tri Sự', 'Ban Hướng Dẫn', 'Ban An Ninh', 'Ban Nghi Lễ', 'Ban Hậu Cần'],
+  'op17_1': ['Ban Tri Sự', 'Ban Hướng Dẫn', 'Ban Tăng Chúng'],
+};
+
+/* ===== TASK DATA ===== */
+const tasks=[
+  {id:1,name:'Dự Toán & Cung Ứng Vật Tư Phật Đản',
+   detail:'Lập danh mục và mua sắm toàn bộ vật tư: nến bơ thuần chay, nhang trầm, hoa tươi, dầu đèn, vải vàng, phướn, đèn lồng cho Đại Lễ Phật Đản 2026.',
+   time:'05/05 → 06/05/2026',deadline:'06/05/2026 · 17:00',tags:['waiting'],
+   bans:['Ban Vật Tư','Ban Tài Chính'],
+   phoi_hop:[{id:'op1_1',text:'Đã lập danh mục 28 mặt hàng, tổng dự toán ~15.200.000đ. Đề nghị Ban Tài Chính giải ngân tạm ứng 70% để đặt hàng sớm, tránh thiếu hàng dịp lễ.',author:'Ban Vật Tư',date:'04/05 · 07:30',likes:3,liked:false,edited:false}],
+   sp_bld:[]},
+  {id:2,name:'Phân Công Nhân Sự Đại Lễ Phật Đản',
+   detail:'Lập danh sách phân công cụ thể từng ban, từng vị trí trong toàn bộ chương trình. Đảm bảo đủ nhân sự đón tiếp phật tử từ sáng sớm 28/3/ÂL.',
+   time:'05/05 → 09/05/2026',deadline:'09/05/2026',tags:['urgent'],
+   bans:['Ban Tri Sự','Ban Hướng Dẫn','Ban An Ninh'],
+   phoi_hop:[{id:'op2_1',text:'Đã lập dự thảo phân công 68 nhân sự cho 6 ban. Đề nghị tất cả ban trưởng xác nhận danh sách trước 21/3/ÂL để kịp in và phổ biến.',author:'Ban Tri Sự',date:'04/05 · 08:00',likes:5,liked:false,edited:false}],
+   sp_bld:[{text:'Phân công rõ ràng là điều rất quan trọng. Mỗi người phải biết rõ nhiệm vụ — đúng giờ, đúng vị trí, đúng tâm. Không để phật tử chờ đợi tại cổng.',author:'BLĐ',date:'04/05 · 12:00',type:'bld'}]},
+  {id:5,name:'Trang Trí Lễ Đài Phật Đản',
+   detail:'Trang trí chánh điện, lễ đài và cổng tam quan với hoa sen, đèn lồng, phướn; bố trí khung cảnh trang nghiêm phục vụ Đại Lễ Phật Đản.',
+   time:'08/05 → 14/05/2026',deadline:'14/05/2026',tags:['urgent'],
+   bans:['Ban Trang Trí','Ban Vật Tư'],
+   phoi_hop:[{id:'op5_1',text:'Đã lên phương án hoa sen 3 tầng tại lễ đài chính. Cần thêm 200 đèn lồng và 50 phướn lớn. Xin phê duyệt kinh phí bổ sung.',author:'Ban Trang Trí',date:'04/05 · 08:30',likes:2,liked:false,edited:false}],
+   sp_bld:[{text:'Lễ đài phải trang nghiêm, thanh tịnh. Hoa sen là biểu trưng của Đức Phật — cần bày trí đúng vị trí, không quá rườm rà.',author:'Sư Phụ',date:'04/05 · 10:00',type:'sp'}]},
+  {id:8,name:'Lễ Mộc Dục & Rước Phật',
+   detail:'Chuẩn bị đầy đủ dụng cụ lễ Mộc Dục: chậu hoa, nước thơm, khăn sạch. Phân công đội hình rước Phật theo nghi thức truyền thống sáng 28/3/ÂL.',
+   time:'14/05 → 15/05/2026',deadline:'15/05/2026',tags:['urgent'],
+   bans:['Ban Nghi Lễ','Ban Tri Sự'],
+   phoi_hop:[{id:'op8_1',text:'Đã chuẩn bị đủ dụng cụ lễ Mộc Dục cho 3 tượng Phật chính. Đội hình rước Phật gồm 24 người, đã tập dượt 1 lần.',author:'Ban Nghi Lễ',date:'05/05 · 08:00',likes:4,liked:false,edited:false}],
+   sp_bld:[{text:'Lễ Mộc Dục là nghi thức quan trọng, cần thực hiện trang nghiêm, đúng pháp. Đội hình rước Phật phải mặc áo tràng, đi đều bước, giữ im lặng hoàn toàn.',author:'Sư Phụ',date:'05/05 · 09:00',type:'sp'}]},
+  {id:10,name:'Chuẩn Bị Ẩm Thực Chay Ngày Lễ',
+   detail:'Lên thực đơn và chuẩn bị bữa cơm chay thết đãi toàn bộ phật tử tham dự. Dự kiến phục vụ 800–1000 suất. Đảm bảo vệ sinh an toàn thực phẩm tuyệt đối.',
+   time:'12/05 → 15/05/2026',deadline:'15/05/2026',tags:['urgent'],
+   bans:['Ban Ẩm Thực','Ban Hậu Cần'],
+   phoi_hop:[
+     {id:'op10_1',text:'Đã lên thực đơn 8 món chay. Cần đặt thêm gạo 200kg, đậu hũ 50kg và rau các loại.',author:'Ban Ẩm Thực',date:'05/05 · 07:30',likes:1,liked:false,edited:false},
+     {id:'op10_2',text:'Đã chuẩn bị 1200 bộ khay, tô, muỗng. Sắp xếp khu vực phục vụ ở sân sau đủ chỗ cho 400 người ngồi cùng lúc.',author:'Ban Hậu Cần',date:'05/05 · 08:30',likes:2,liked:false,edited:false}
+   ],
+   sp_bld:[{text:'Cơm chay ngày lễ là phước duyên. Nấu với tâm thành, không để thiếu người.',author:'Sư Phụ',date:'05/05 · 12:00',type:'sp'}]},
+  {id:3,name:'Truyền Thông & Livestream Phật Đản',
+   detail:'Thiết kế banner, poster, đăng thông báo mạng xã hội; chuẩn bị và vận hành hệ thống livestream toàn bộ chương trình Đại Lễ Phật Đản.',
+   time:'05/05 → 10/05/2026',deadline:'10/05/2026',tags:['important'],
+   bans:['Ban Truyền Thông'],
+   phoi_hop:[{id:'op3_1',text:'Đã thiết kế xong 3 mẫu banner chính. Kênh YouTube và Facebook đã đăng thông báo lịch lễ.',author:'Ban Truyền Thông',date:'04/05 · 10:00',likes:6,liked:false,edited:false}],
+   sp_bld:[{text:'Nội dung đăng tải cần giữ văn phong trang trọng, đúng Chánh Pháp. Livestream phải đảm bảo âm thanh rõ ràng.',author:'Sư Phụ',date:'04/05 · 11:00',type:'sp'}]},
+  {id:4,name:'Họp Kiểm Tra Tiến Độ Lần Cuối',
+   detail:'Họp toàn bộ các ban vào chiều 26/3/ÂL để rà soát tiến độ lần cuối, xử lý phát sinh và xác nhận mọi công tác đã sẵn sàng trước giờ khai lễ.',
+   time:'13/05/2026 · 14:00 – 17:00',deadline:'13/05/2026',tags:['important'],
+   bans:['Ban Tri Sự','Ban Văn Phòng'],
+   phoi_hop:[{id:'op4_1',text:'Đề xuất họp tại Hội Trường lớn, mời đầy đủ trưởng các ban. Cần chuẩn bị bảng kiểm tra tiến độ chi tiết theo từng hạng mục.',author:'Ban Tri Sự',date:'04/05 · 13:00',likes:0,liked:false,edited:false}],
+   sp_bld:[]},
+  {id:6,name:'Chuẩn Bị Hương Đăng & Lễ Vật',
+   detail:'Sắp xếp hương, đèn, nến tại chánh điện và các ban thờ. Phân công trực hương đăng xuyên đêm 27/3 và toàn ngày 28/3/ÂL.',
+   time:'14/05 → 15/05/2026',deadline:'14/05/2026',tags:['important'],
+   bans:['Ban Hương Đăng','Ban Lễ Vật'],
+   phoi_hop:[{id:'op6_1',text:'Đã phân công 12 người trực hương đăng suốt đêm 27/3 và toàn ngày 28/3/ÂL.',author:'Ban Hương Đăng',date:'04/05 · 09:00',likes:3,liked:false,edited:false}],
+   sp_bld:[{text:'Hương đăng là việc thiêng liêng, cần người có tâm thành kính.',author:'Sư Phụ',date:'04/05 · 11:30',type:'sp'}]},
+  {id:7,name:'Kiểm Tra Hệ Thống Âm Thanh Ánh Sáng',
+   detail:'Kiểm tra và hiệu chỉnh toàn bộ hệ thống loa, micro, đèn chiếu sáng tại chánh điện và khu vực ngoài trời.',
+   time:'10/05 → 12/05/2026',deadline:'12/05/2026',tags:['important'],
+   bans:['Ban Kỹ Thuật','Ban Truyền Thông'],
+   phoi_hop:[
+     {id:'op7_1',text:'Đã kiểm tra hệ thống loa chính, cần thay thế 2 micro không dây bị suy giảm tín hiệu.',author:'Ban Kỹ Thuật',date:'05/05 · 09:00',likes:2,liked:false,edited:false},
+     {id:'op7_2',text:'Phối hợp cài đặt thiết bị livestream song song với hệ thống âm thanh.',author:'Ban Truyền Thông',date:'05/05 · 10:30',likes:1,liked:false,edited:false}
+   ],
+   sp_bld:[{text:'Âm thanh là yếu tố quan trọng giúp đại chúng tập trung. Cần thử âm toàn bộ trước ít nhất 1 ngày.',author:'BLĐ',date:'05/05 · 14:00',type:'bld'}]},
+  {id:9,name:'Tiếp Đón & Hướng Dẫn Phật Tử',
+   detail:'Bố trí đội tiếp đón tại cổng tam quan từ 5:00 sáng ngày lễ. Chuẩn bị bảng hướng dẫn, sơ đồ khuôn viên, phân luồng giao thông.',
+   time:'14/05 → 15/05/2026',deadline:'15/05/2026',tags:['important'],
+   bans:['Ban Hướng Dẫn','Ban An Ninh'],
+   phoi_hop:[{id:'op9_1',text:'Đã bố trí 20 người tiếp đón chia 3 ca. In 500 tờ sơ đồ hướng dẫn.',author:'Ban Hướng Dẫn',date:'05/05 · 10:00',likes:4,liked:false,edited:false}],
+   sp_bld:[{text:'Đón tiếp phật tử với tâm từ bi, nụ cười thân thiện.',author:'BLĐ',date:'05/05 · 11:00',type:'bld'}]},
+  {id:13,name:'Xin Ý Kiến Về Chương Trình Văn Nghệ Phật Đản',
+   detail:'Ban Truyền Thông đề xuất tổ chức tiết mục văn nghệ Phật giáo (nhạc đạo, múa sen) sau lễ chính. Cần xin ý kiến BLĐ về hình thức, thời lượng và danh sách tiết mục.',
+   time:'06/05 → 08/05/2026',deadline:'08/05/2026',tags:['waiting'],
+   bans:['Ban Truyền Thông','Ban Tri Sự'],
+   phoi_hop:[{id:'op13_1',text:'Đã soạn dự thảo chương trình 5 tiết mục nhạc đạo và 2 màn múa sen. Tổng thời lượng ~45 phút.',author:'Ban Truyền Thông',date:'05/05 · 14:00',likes:0,liked:false,edited:false}],
+   sp_bld:[]},
+  {id:14,name:'Xin Phép Sử Dụng Bãi Đỗ Xe Ngoài Khuôn Viên',
+   detail:'Dự kiến lượng phật tử đông, cần mượn bãi đất trống phía tây chùa làm bãi đỗ xe tạm thời ngày lễ.',
+   time:'06/05 → 07/05/2026',deadline:'07/05/2026',tags:['waiting'],
+   bans:['Ban An Ninh','Ban Tri Sự'],
+   phoi_hop:[{id:'op14_1',text:'Ban An Ninh đã khảo sát, bãi đất có thể chứa ~150 xe máy và 20 ô tô. Cần công văn xin phép UBND phường.',author:'Ban An Ninh',date:'05/05 · 09:30',likes:1,liked:false,edited:false}],
+   sp_bld:[]},
+  {id:11,name:'Phát Hành Tập San Phật Đản 2026',
+   detail:'Biên soạn và in ấn tập san kỷ niệm Đại Lễ Phật Đản 2026. Số lượng 1.000 bản.',
+   time:'01/05 → 05/05/2026',deadline:'05/05/2026',tags:[],
+   bans:['Ban Văn Phòng','Ban Truyền Thông'],
+   phoi_hop:[{id:'op11_1',text:'Đã hoàn thiện bản thảo, đang chờ lời đạo từ của Sư Phụ.',author:'Ban Văn Phòng',date:'04/05 · 14:00',likes:2,liked:false,edited:false}],
+   sp_bld:[{text:'Lời đạo từ sẽ gửi trước 22/3/ÂL. Tập san phải trang trọng, nội dung thuần Phật pháp.',author:'Sư Phụ',date:'05/05 · 08:00',type:'sp'}]},
+  {id:15,name:'Duyệt Ngân Sách Đại Lễ Tháng 3 ÂL',
+   detail:'Tổng hợp và trình BLĐ duyệt toàn bộ ngân sách chi tiêu cho Đại Lễ Phật Đản. Đã quá hạn trình, cần xử lý gấp.',
+   time:'28/04 → 02/05/2026',deadline:'02/05/2026',tags:[],
+   bans:['Ban Tài Chính','Ban Tri Sự'],
+   phoi_hop:[{id:'op15_1',text:'Đã tổng hợp 12 hạng mục chi, tổng dự toán 87.500.000đ.',author:'Ban Tài Chính',date:'01/05 · 16:00',likes:0,liked:false,edited:false}],
+   sp_bld:[{text:'Yêu cầu Ban Tài Chính bổ sung mục dự phòng 5% và nộp lại bản chính ký tay trước khi duyệt.',author:'BLĐ',date:'02/05 · 10:00',type:'bld'}]},
+  {id:12,name:'Vệ Sinh Tổng Thể Khuôn Viên Chùa',
+   detail:'Vệ sinh toàn bộ khuôn viên, các điện thờ, nhà vệ sinh công cộng trước ngày đại lễ.',
+   time:'10/05 → 13/05/2026',deadline:'13/05/2026',tags:['done'],
+   bans:['Ban Hậu Cần','Ban Tăng Chúng'],
+   phoi_hop:[{id:'op12_1',text:'Đã hoàn thành vệ sinh toàn bộ khuôn viên. Đã bố trí 40 chậu hoa dọc lối vào chánh điện.',author:'Ban Hậu Cần',date:'05/05 · 16:00',likes:7,liked:false,edited:false}],
+   sp_bld:[{text:'Khuôn viên sạch sẽ, trang nghiêm — thể hiện tâm cung kính với ngày lễ.',author:'BLĐ',date:'05/05 · 17:00',type:'bld'}]},
+  {id:16,name:'In Ấn Thẻ Phân Công & Biển Chỉ Dẫn',
+   detail:'In thẻ nhận diện cho tất cả nhân sự ban phối hợp và in biển chỉ dẫn đặt tại các vị trí trong khuôn viên chùa dịp Đại Lễ.',
+   time:'01/05 → 04/05/2026',deadline:'04/05/2026',tags:['done'],
+   bans:['Ban Văn Phòng','Ban Tri Sự'],
+   phoi_hop:[{id:'op16_1',text:'Đã in xong 80 thẻ nhận diện và 25 biển chỉ dẫn. Biển chỉ dẫn đã lắp đặt tại 12 vị trí cố định.',author:'Ban Văn Phòng',date:'04/05 · 15:00',likes:5,liked:false,edited:false}],
+   sp_bld:[{text:'Biển chỉ dẫn phải rõ ràng, dễ đọc. Thẻ nhân sự phải đeo trong suốt thời gian làm việc.',author:'BLĐ',date:'04/05 · 16:30',type:'bld'}]},
+  {id:17,name:'Kiểm Tra An Ninh & Phòng Cháy Chữa Cháy',
+   detail:'Kiểm tra toàn bộ hệ thống PCCC, lối thoát hiểm, phân công nhân sự an ninh 24/7 trong các ngày lễ.',
+   time:'03/05 → 05/05/2026',deadline:'05/05/2026',tags:['done'],
+   bans:['Ban An Ninh'],
+   phoi_hop:[{id:'op17_1',text:'Đã kiểm tra 8 bình chữa cháy, tất cả còn hạn sử dụng. Phân công 6 người trực an ninh theo ca.',author:'Ban An Ninh',date:'05/05 · 17:30',likes:3,liked:false,edited:false}],
+   sp_bld:[{text:'An ninh và PCCC là ưu tiên hàng đầu. Không được để lửa hương gần vật dễ cháy.',author:'BLĐ',date:'05/05 · 18:00',type:'bld'}]},
+];
+
+/* ===== OUTGOING TASKS ===== */
+const outgoingTasks = [
+  {id:'o1', name:'Soạn Thảo Công Văn Xin Phép UBND',
+   detail:'Ban Tri Sự yêu cầu Ban Văn Phòng soạn thảo công văn xin phép UBND phường về việc tổ chức Đại Lễ Phật Đản và sử dụng bãi đỗ xe ngoài khuôn viên.',
+   time:'06/05 → 07/05/2026', tags:['urgent'],
+   assignedTo:'Ban Văn Phòng',
+   assignedNote:'Nộp bản nháp trước 17:00 ngày 07/05',
+   progress:60,
+   latestReport:'Đã soạn xong bản nháp, đang chờ trưởng ban ký. Dự kiến gửi UBND sáng 07/05.',
+   reportDate:'05/05 · 16:00'},
+  {id:'o2', name:'Lập Danh Sách Nhân Sự Toàn Bộ Các Ban',
+   detail:'Yêu cầu các ban trưởng nộp danh sách nhân sự tham gia Đại Lễ, bao gồm họ tên, số điện thoại, vị trí phân công.',
+   time:'05/05 → 08/05/2026', tags:['urgent'],
+   assignedTo:'Tất cả Ban Trưởng',
+   assignedNote:'Hạn nộp: 08/05/2026 · 20:00',
+   progress:40,
+   latestReport:'Đã nhận danh sách từ 4/8 ban. Ban Hậu Cần và Ban Lễ Vật chưa nộp.',
+   reportDate:'05/05 · 19:00'},
+  {id:'o3', name:'Thiết Kế Sơ Đồ Bố Trí Khuôn Viên Đại Lễ',
+   detail:'Ban Tri Sự giao Ban Truyền Thông thiết kế sơ đồ bố trí khu vực chánh điện, lễ đài, bãi đỗ xe, khu ẩm thực dịp Đại Lễ.',
+   time:'05/05 → 09/05/2026', tags:['important'],
+   assignedTo:'Ban Truyền Thông',
+   assignedNote:'Duyệt lần cuối với Ban Tri Sự',
+   progress:80,
+   latestReport:'Đã hoàn thành bản thiết kế v2, đã gửi qua email Ban Tri Sự để xét duyệt.',
+   reportDate:'05/05 · 14:30'},
+  {id:'o4', name:'Mua Sắm Bổ Sung Vật Tư Trang Trí',
+   detail:'Ban Tri Sự phê duyệt danh mục bổ sung 200 đèn lồng và 50 phướn lớn. Giao Ban Vật Tư thực hiện mua sắm và bàn giao cho Ban Trang Trí trước 12/05.',
+   time:'06/05 → 12/05/2026', tags:['important'],
+   assignedTo:'Ban Vật Tư',
+   assignedNote:'Bàn giao cho Ban Trang Trí trước 12/05',
+   progress:25,
+   latestReport:'Đang liên hệ 3 nhà cung cấp để so sánh giá. Dự kiến đặt hàng ngày 07/05.',
+   reportDate:'05/05 · 11:00'},
+  {id:'o5', name:'Tập Dượt Đội Hình Rước Phật Lần 2',
+   detail:'Ban Tri Sự yêu cầu Ban Nghi Lễ tổ chức buổi tập dượt đội hình rước Phật lần 2 để đảm bảo đúng nghi thức.',
+   time:'10/05 → 11/05/2026', tags:['important'],
+   assignedTo:'Ban Nghi Lễ',
+   assignedNote:'Báo cáo kết quả sau buổi tập',
+   progress:0,
+   latestReport:'Chưa bắt đầu. Lịch tập dự kiến 10/05 · 08:00 tại sân chánh điện.',
+   reportDate:'05/05 · 09:30'},
+  {id:'o6', name:'Kiểm Kê Tồn Kho Vật Tư Sau Lễ',
+   detail:'Sau khi đại lễ kết thúc, Ban Vật Tư tiến hành kiểm kê toàn bộ vật tư còn lại và lập báo cáo thanh lý gửi Ban Tài Chính.',
+   time:'16/05 → 18/05/2026', tags:[],
+   assignedTo:'Ban Vật Tư',
+   assignedNote:'Gửi báo cáo cho Ban Tài Chính',
+   progress:0,
+   latestReport:'Chưa đến hạn thực hiện.',
+   reportDate:''},
+  {id:'o7', name:'Bố Trí Xe Đưa Đón Chư Tăng',
+   detail:'Ban Tri Sự giao Ban Hậu Cần liên hệ và sắp xếp xe đưa đón chư Tăng từ các tự viện lân cận về tham dự Đại Lễ Phật Đản.',
+   time:'13/05 → 15/05/2026', tags:['waiting'],
+   assignedTo:'Ban Hậu Cần',
+   assignedNote:'Xin xác nhận số lượng chư Tăng trước khi đặt xe',
+   progress:30,
+   latestReport:'Đã liên hệ 4 tự viện, xác nhận 22 chư Tăng. Đang chờ ý kiến BLĐ về số lượng xe cần đặt.',
+   reportDate:'05/05 · 15:00'},
+  {id:'o8', name:'Tổng Kết & Báo Cáo Sau Đại Lễ',
+   detail:'Sau đại lễ, tất cả các ban nộp báo cáo tổng kết công việc, ghi nhận kinh nghiệm và đề xuất cải tiến cho các lễ sau.',
+   time:'16/05 → 20/05/2026', tags:[],
+   assignedTo:'Tất cả Ban Trưởng',
+   assignedNote:'Nộp về Ban Tri Sự trước 20/05',
+   progress:0,
+   latestReport:'Chưa đến hạn. Mẫu báo cáo sẽ gửi sau ngày lễ.',
+   reportDate:''},
+];
+
+/* ===== STATE ===== */
+let filterStatus='all',filterDate='all',filterBan='all',sortMode='deadline';
+let dateFrom=null,dateTo=null;
+let currentLoai='phoi-hop';
+let currentStatusTab='active';
+const IPP=5;
+let currentPage=1,filteredList=[];
+let currentOutPage=1,filteredOutList=[];
+
+/* ===== SORT ===== */
+function selectSort(val,el){
+  sortMode=val;
+  document.querySelectorAll('#dd-sort-menu .dd-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  const labels={deadline:'📊 Sắp xếp theo: Hạn',name:'📊 Sắp xếp theo: Tên',status:'📊 Sắp xếp theo: Ưu tiên'};
+  document.getElementById('sort-label').innerHTML=labels[val];
+  document.getElementById('dd-sort-menu').classList.remove('open');
+  document.querySelector('#dd-sort .dd-btn').classList.remove('open');
+  applyFilters();
+}
+
+function sortTasks(list){
+  const priority={urgent:0,waiting:1,important:2,normal:3,done:4};
+  return [...list].sort((a,b)=>{
+    if(sortMode==='name') return a.name.localeCompare(b.name,'vi');
+    if(sortMode==='status') return (priority[getStatusTag(a)]??3)-(priority[getStatusTag(b)]??3);
+    const ra=parseRange(a),rb=parseRange(b);
+    const ea=ra?ra.end.getTime():9e15,eb=rb?rb.end.getTime():9e15;
+    return ea-eb;
+  });
+}
+
+/* ===== LOAI SWITCH ===== */
+function selectLoai(val,el){
+  currentLoai=val;
+  document.querySelectorAll('#dd-loai-menu .dd-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  const labels={'phoi-hop':'🤝 Các ban phối hợp','bts':'🏛️ Công việc của BTS','giao-di':'📋 Công việc BTS giao cho các ban'};
+  document.getElementById('loai-label').innerHTML=labels[val];
+  document.getElementById('dd-loai-menu').classList.remove('open');
+  document.querySelector('#dd-loai .dd-btn').classList.remove('open');
+  document.getElementById('panel-main').style.display=val!=='giao-di'?'block':'none';
+  document.getElementById('panel-giao-di').style.display=val==='giao-di'?'block':'none';
+  document.getElementById('statusToggleWrap').style.display=val!=='giao-di'?'flex':'none';
+  applyFilters();
+}
+
+/* ===== STATUS TAB SWITCH ===== */
+function switchStatusTab(tab){
+  currentStatusTab=tab;
+  document.querySelectorAll('.status-toggle-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('stab-'+tab).classList.add('active');
+  currentPage=1;
+  renderPage();
+  renderPagination();
+}
+
+/* ===== DATE FILTER ===== */
+function matchDate(task){
+  if(filterDate==='all') return true;
+  if(filterDate==='yesterday') return coversDay(task,relDate(-1));
+  if(filterDate==='today')     return coversDay(task,TODAY);
+  if(filterDate==='tomorrow')  return coversDay(task,relDate(1));
+  if(filterDate==='week')      return overlaps(task,TODAY,relDate(7));
+  if(filterDate==='custom'){
+    const rf=dateFrom||new Date(0);
+    const rt=dateTo||new Date(9999,0,1);
+    return overlaps(task,rf,rt);
+  }
+  return true;
+}
+
+/* ===== FILTER ===== */
+function applyFilters(){
+  const kw=(document.getElementById('keywordInput').value||'').toLowerCase().trim();
+
+  filteredList=tasks.filter(t=>{
+    const st=getStatusTag(t);
+    if(filterStatus==='normal'){
+      if(st!=='normal') return false;
+    } else if(filterStatus!=='all' && st!==filterStatus) return false;
+    if(filterBan!=='all' && !t.bans.includes(filterBan)) return false;
+    if(!matchDate(t)) return false;
+    if(kw){
+      const haystack=(t.name+' '+t.detail+' '+t.bans.join(' ')+' '+(t.phoi_hop||[]).map(o=>o.text).join(' ')+' '+(t.sp_bld||[]).map(o=>o.text).join(' ')).toLowerCase();
+      if(!haystack.includes(kw)) return false;
+    }
+    return true;
+  });
+
+  filteredList=sortTasks(filteredList);
+
+  filteredOutList=outgoingTasks.filter(t=>{
+    if(kw){
+      const h=(t.name+' '+t.detail+' '+t.assignedTo+' '+t.latestReport).toLowerCase();
+      if(!h.includes(kw)) return false;
+    }
+    return true;
+  });
+
+  currentPage=1; currentOutPage=1;
+  renderPage();
+  renderPagination();
+  renderOutPage();
+  renderOutPagination();
+}
+
+/* ===== RENDER OPINIONS ===== */
+function renderOpPhoi(list,taskId){
+  if(!list||!list.length) return `<span style="color:#bbb;font-size:16px;font-style:italic;">Chưa có ý kiến…</span>`;
+  return list.map((op,i)=>{
+    const likers = sampleLikers[op.id] || [];
+    const likerCount = op.likes;
+    return `
+    ${i>0?'<hr class="op-divider">':''}
+    <div class="opinion-block" id="opblock_${op.id}">
+      <div class="op-text" id="optext_${op.id}">${truncateWords(op.text, 35)}</div>
+    </div>
+    <div class="op-author">
+      <span class="author-tag tag-normal">${op.author}</span>
+      ${convertOpDate(op.date)}
+      ${op.edited?'<span class="op-edited-tag">· đã chỉnh sửa</span>':''}
+    </div>
+    <div class="op-actions">
+      <div class="like-wrap" id="likewrap_${op.id}">
+        <button class="op-like-btn ${op.liked?'liked':''}" onclick="toggleLike('${taskId}','${op.id}',this)" onmouseenter="showLikesPopup('${op.id}')" onmouseleave="hideLikesPopupDelayed('${op.id}')">
+          <span class="like-label">${op.liked?'❤️':'🤍'}</span>
+          <span class="op-like-count">${likerCount}</span>
+          <span style="font-size:13px;opacity:.7;">lượt thích</span>
+        </button>
+        <div class="likes-popup" id="likespopup_${op.id}" onmouseenter="keepLikesPopup('${op.id}')" onmouseleave="hideLikesPopup('${op.id}')">
+          <div class="likes-popup-title">Đã thích ❤️</div>
+          ${likers.length===0
+            ? '<div class="likes-popup-empty">Chưa có ai thích</div>'
+            : likers.map(name=>`<div class="likes-popup-item"><div class="likes-popup-avatar">${name.slice(-2)}</div>${name}</div>`).join('')
+          }
+        </div>
+      </div>
+      <button class="op-edit-btn" onclick="startEdit('${taskId}','${op.id}')">✏️ Sửa</button>
+    </div>
+  `}).join('');
+}
+function renderOpSP(list){
+  if(!list||!list.length) return '';
+  return [...list].sort((a,b)=>({sp:0,bld:1}[a.type]??2)-({sp:0,bld:1}[b.type]??2))
+    .map(op=>`<div class="sp-block">
+      <div class="opinion-block"><div class="op-text">${truncateWords(op.text, 35)}</div></div>
+      <div class="op-author"><span class="author-tag ${op.type==='sp'?'tag-sp':op.type==='bld'?'tag-bld':'tag-normal'}">${op.author}</span><span>${convertOpDate(op.date)}</span></div>
+    </div>`).join('');
+}
+
+/* ===== LIKES POPUP ===== */
+let hideTimers = {};
+function showLikesPopup(opId){
+  clearTimeout(hideTimers[opId]);
+  const popup = document.getElementById('likespopup_'+opId);
+  if(popup) popup.classList.add('open');
+}
+function hideLikesPopupDelayed(opId){
+  hideTimers[opId] = setTimeout(()=>hideLikesPopup(opId), 200);
+}
+function keepLikesPopup(opId){
+  clearTimeout(hideTimers[opId]);
+}
+function hideLikesPopup(opId){
+  const popup = document.getElementById('likespopup_'+opId);
+  if(popup) popup.classList.remove('open');
+}
+
+/* ===== LIKE / EDIT ===== */
+function toggleLike(taskId,opId,btn){
+  const task=tasks.find(t=>String(t.id)===String(taskId));
+  if(!task) return;
+  const op=task.phoi_hop.find(o=>o.id===opId);
+  if(!op) return;
+  op.liked=!op.liked;
+  op.likes+=op.liked?1:-1;
+  const likers = sampleLikers[op.id] || [];
+  if(op.liked) { if(!likers.includes('Phan Tuấn Anh')) likers.push('Phan Tuấn Anh'); }
+  else { const idx=likers.indexOf('Phan Tuấn Anh'); if(idx>=0) likers.splice(idx,1); }
+  sampleLikers[op.id] = likers;
+  btn.innerHTML=`<span class="like-label">${op.liked?'❤️':'🤍'}</span><span class="op-like-count">${op.likes}</span><span style="font-size:13px;opacity:.7;">lượt thích</span>`;
+  btn.classList.toggle('liked',op.liked);
+  const popup=document.getElementById('likespopup_'+opId);
+  if(popup){
+    popup.innerHTML=`<div class="likes-popup-title">Đã thích ❤️</div>`
+      + (likers.length===0
+        ? '<div class="likes-popup-empty">Chưa có ai thích</div>'
+        : likers.map(name=>`<div class="likes-popup-item"><div class="likes-popup-avatar">${name.slice(-2)}</div>${name}</div>`).join(''));
+  }
+}
+
+function startEdit(taskId,opId){
+  const task=tasks.find(t=>String(t.id)===String(taskId));
+  if(!task) return;
+  const op=task.phoi_hop.find(o=>o.id===opId);
+  if(!op) return;
+  const block=document.getElementById('opblock_'+opId);
+  if(!block) return;
+  block.innerHTML=`
+    <textarea class="op-edit-area" id="editarea_${opId}">${op.text}</textarea>
+    <div class="op-edit-actions">
+      <button class="op-save-btn" onclick="saveEdit('${taskId}','${opId}')">✓ Lưu</button>
+      <button class="op-cancel-btn" onclick="cancelEdit('${taskId}','${opId}')">Hủy</button>
+    </div>
+  `;
+}
+function saveEdit(taskId,opId){
+  const task=tasks.find(t=>String(t.id)===String(taskId));
+  if(!task) return;
+  const op=task.phoi_hop.find(o=>o.id===opId);
+  if(!op) return;
+  const area=document.getElementById('editarea_'+opId);
+  if(!area) return;
+  op.text=area.value.trim()||op.text;
+  op.edited=true;
+  renderPage();
+}
+function cancelEdit(taskId,opId){
+  const task=tasks.find(t=>String(t.id)===String(taskId));
+  if(!task) return;
+  const op=task.phoi_hop.find(o=>o.id===opId);
+  if(!op) return;
+  const block=document.getElementById('opblock_'+opId);
+  if(!block) return;
+  block.innerHTML=`<div class="op-text" id="optext_${opId}">${truncateWords(op.text, 35)}</div>`;
+}
+
+/* ===== MOBILE TOGGLE ===== */
+function mToggle(btn, colIndex) {
+  const tr = btn.closest('tr');
+  const tds = tr.querySelectorAll('td');
+  const td = tds[colIndex];
+  if (!td) return;
+  const isOpen = td.classList.contains('m-open');
+  td.classList.toggle('m-open', !isOpen);
+  btn.classList.toggle('active', !isOpen);
+}
+
+/* ===== RENDER MAIN PAGE ===== */
+function renderPage(){
+  const tbody=document.getElementById('taskBody');
+  let display=filteredList.filter(t=>{
+    const st=getStatusTag(t);
+    if(currentStatusTab==='done') return st==='done';
+    return st!=='done';
+  });
+
+  const start=(currentPage-1)*IPP;
+  const slice=display.slice(start,start+IPP);
+  const end=Math.min(start+IPP,display.length);
+  document.getElementById('pgInfo').innerHTML=
+    display.length===0
+      ? 'Không tìm thấy công việc nào phù hợp'
+      : `Hiển thị <strong>${start+1} – ${end}</strong> trên tổng <strong>${display.length}</strong> công việc`;
+  if(!slice.length){
+    tbody.innerHTML=`<tr><td colspan="3" style="text-align:center;padding:50px;color:#bbb;font-size:16px;font-style:italic;">Không tìm thấy công việc nào phù hợp bộ lọc.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML=slice.map(t=>{
+    const dc=getDotClass(t);
+    const tAL=convertTimeRange(t.time);
+    const phoiCount=(t.phoi_hop||[]).length;
+    const spCount=(t.sp_bld||[]).length;
+    return `<tr>
+      <td>
+        <div class="task-header">
+          ${dc?`<span class="status-dot ${dc}"></span>`:''}
+          <div class="task-name">${t.name}</div>
+          <a class="task-detail-link chi-tiet-mob" href="#" onclick="return false;">Chi tiết</a>
+        </div>
+        ${t.detail?`<div class="task-detail-txt">${truncateWords(t.detail, 35)}</div>`:''}
+        <div class="task-footer">
+          ${tAL?`<div class="task-time">📅 ${tAL}</div>`:'<div></div>'}
+          <a class="task-detail-link chi-tiet-desk" href="#" onclick="return false;">Chi tiết →</a>
+        </div>
+        <div class="mobile-toggles">
+          ${phoiCount>0?`<button class="mtoggle" onclick="mToggle(this,1)">💬 Ý kiến các ban <span class="mtoggle-count">${phoiCount}</span> <span class="mtoggle-arrow">▼</span></button>`:''}
+          ${spCount>0?`<button class="mtoggle" onclick="mToggle(this,2)">🙏 Sư Phụ/BLĐ <span class="mtoggle-count">${spCount}</span> <span class="mtoggle-arrow">▼</span></button>`:''}
+        </div>
+      </td>
+      <td>${renderOpPhoi(t.phoi_hop,t.id)}</td>
+      <td>${renderOpSP(t.sp_bld)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ===== RENDER GIAO ĐI ===== */
+function renderOutPage(){
+  const tbody=document.getElementById('outTaskBody');
+  const start=(currentOutPage-1)*IPP;
+  const slice=filteredOutList.slice(start,start+IPP);
+  const end=Math.min(start+IPP,filteredOutList.length);
+  document.getElementById('pgInfoOut').innerHTML=
+    filteredOutList.length===0
+      ? 'Không tìm thấy công việc nào'
+      : `Hiển thị <strong>${start+1} – ${end}</strong> trên tổng <strong>${filteredOutList.length}</strong> công việc`;
+  if(!slice.length){
+    tbody.innerHTML=`<tr><td colspan="3" style="text-align:center;padding:50px;color:#bbb;font-size:16px;font-style:italic;">Không tìm thấy công việc nào.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML=slice.map(t=>{
+    const st=getStatusTag(t);
+    const dotColor=getDotColor(st);
+    const tAL=convertTimeRange(t.time);
+    const progClass=t.progress===100?'prog-done':t.progress>0?'prog-partial':'prog-none';
+    return `<tr>
+      <td>
+        <div class="task-header">
+          <span class="status-dot" style="background:${dotColor};box-shadow:0 0 0 3px ${dotColor}22;"></span>
+          <div class="task-name">${t.name}</div>
+        </div>
+        <div class="task-detail-txt">${truncateWords(t.detail, 35)}</div>
+        ${tAL?`<div class="task-time" style="margin-top:10px;">📅 ${tAL}</div>`:''}
+        <div class="mobile-toggles">
+          <button class="mtoggle" onclick="mToggle(this,1)">🏛 Ban được giao <span class="mtoggle-arrow">▼</span></button>
+          <button class="mtoggle" onclick="mToggle(this,2)">📊 Tiến độ ${t.progress>0?`<span class="mtoggle-count">${t.progress}%</span>`:''} <span class="mtoggle-arrow">▼</span></button>
+        </div>
+      </td>
+      <td>
+        <div class="assigned-ban">${t.assignedTo}</div>
+        <div class="assigned-note">${t.assignedNote}</div>
+      </td>
+      <td>
+        <div class="progress-wrap" style="margin-bottom:10px;">
+          <div class="progress-bar"><div class="progress-fill ${progClass}" style="width:${t.progress}%"></div></div>
+          <span class="progress-pct">${t.progress}%</span>
+        </div>
+        ${t.latestReport?`<div class="opinion-block"><div class="op-text">${truncateWords(t.latestReport, 35)}</div></div>`:''}
+        ${t.reportDate?`<div class="op-author" style="margin-top:6px;">${convertOpDate(t.reportDate)}</div>`:''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ===== PAGINATION ===== */
+function renderPagination(){
+  let display=filteredList.filter(t=>{
+    const st=getStatusTag(t);
+    if(currentStatusTab==='done') return st==='done';
+    return st!=='done';
+  });
+  const total=Math.ceil(display.length/IPP);
+  const c=document.getElementById('pagination');
+  if(total<=1){c.innerHTML='';return;}
+  let h=`<button class="pg-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+  for(let i=1;i<=total;i++){
+    if(total>7&&i>2&&i<total-1&&Math.abs(i-currentPage)>1){
+      if(i===3||i===total-2)h+=`<button class="pg-btn dots">…</button>`;
+      continue;
+    }
+    h+=`<button class="pg-btn${i===currentPage?' active':''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  h+=`<button class="pg-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}>›</button>`;
+  c.innerHTML=h;
+}
+function goPage(n){
+  let display=filteredList.filter(t=>{
+    const st=getStatusTag(t);
+    if(currentStatusTab==='done') return st==='done';
+    return st!=='done';
+  });
+  const total=Math.ceil(display.length/IPP);
+  if(n<1||n>total)return;
+  currentPage=n;renderPage();renderPagination();
+}
+function renderOutPagination(){
+  const total=Math.ceil(filteredOutList.length/IPP);
+  const c=document.getElementById('paginationOut');
+  if(total<=1){c.innerHTML='';return;}
+  let h=`<button class="pg-btn" onclick="goOutPage(${currentOutPage-1})" ${currentOutPage===1?'disabled':''}>‹</button>`;
+  for(let i=1;i<=total;i++){
+    if(total>7&&i>2&&i<total-1&&Math.abs(i-currentOutPage)>1){
+      if(i===3||i===total-2)h+=`<button class="pg-btn dots">…</button>`;
+      continue;
+    }
+    h+=`<button class="pg-btn${i===currentOutPage?' active':''}" onclick="goOutPage(${i})">${i}</button>`;
+  }
+  h+=`<button class="pg-btn" onclick="goOutPage(${currentOutPage+1})" ${currentOutPage===total?'disabled':''}>›</button>`;
+  c.innerHTML=h;
+}
+function goOutPage(n){
+  const total=Math.ceil(filteredOutList.length/IPP);
+  if(n<1||n>total)return;
+  currentOutPage=n;renderOutPage();renderOutPagination();
+}
+
+/* ===== TOPBAR ===== */
+function initTopbar(){
+  const now=new Date();
+  document.getElementById('dtDuong').textContent=`${THU[now.getDay()]}, ${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
+  const lunar=LUNAR_TABLE[isoKey(now)];
+  if(lunar) document.getElementById('dtAm').textContent=`🌙 ${lunar.d} tháng ${lunar.m} Âm Lịch`;
+}
+
+/* ===== DROPDOWNS ===== */
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.dd-wrap')){
+    document.querySelectorAll('.dd-menu').forEach(m=>m.classList.remove('open'));
+    document.querySelectorAll('.dd-btn').forEach(b=>b.classList.remove('open'));
+  }
+  if(!e.target.closest('.ldp-wrap')){
+    document.querySelectorAll('.ldp-cal').forEach(c=>c.style.display='none');
+    document.querySelectorAll('.ldp-input').forEach(i=>i.classList.remove('open'));
+  }
+  if(!e.target.closest('.like-wrap')){
+    document.querySelectorAll('.likes-popup').forEach(p=>p.classList.remove('open'));
+  }
+});
+function toggleDD(id){
+  const wrap=document.getElementById(id);
+  const menu=wrap.querySelector('.dd-menu');
+  const btn=wrap.querySelector('.dd-btn');
+  const was=menu.classList.contains('open');
+  document.querySelectorAll('.dd-menu').forEach(m=>m.classList.remove('open'));
+  document.querySelectorAll('.dd-btn').forEach(b=>b.classList.remove('open'));
+  if(!was){menu.classList.add('open');btn.classList.add('open');}
+}
+
+const SL={all:'Tất cả trạng thái',urgent:'Khẩn Cấp',important:'Quan Trọng',waiting:'Xin Chỉ Dạy',normal:'Bình Thường'};
+const SC={all:'#adb5bd',urgent:'#c0392b',important:'#e07b39',waiting:'#c9a84c',normal:'#2d6a4f'};
+
+function selectStatus(val,el){
+  filterStatus=val;
+  document.querySelectorAll('#dd-status-menu .dd-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('status-label').innerHTML=`<span style="width:10px;height:10px;border-radius:50%;background:${SC[val]};display:inline-block;flex-shrink:0;"></span> ${SL[val]}`;
+  document.getElementById('dd-status-menu').classList.remove('open');
+  document.querySelector('#dd-status .dd-btn').classList.remove('open');
+  applyFilters();
+}
+const DL={all:'Tất cả thời gian',yesterday:'Hôm qua',today:'Hôm nay',tomorrow:'Ngày mai',week:'7 ngày tới',custom:'Tùy chọn'};
+function selectDate(val,el){
+  filterDate=val;
+  document.querySelectorAll('#dd-date-menu .dd-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('date-label').innerHTML=`📅 ${DL[val]||val}`;
+  document.getElementById('date-range-row').style.display=val==='custom'?'block':'none';
+  if(val!=='custom'){
+    document.getElementById('dd-date-menu').classList.remove('open');
+    document.querySelector('#dd-date .dd-btn').classList.remove('open');
+    applyFilters();
+  }
+}
+
+/* ===== LUNAR DATE PICKER ===== */
+const LDP_MONTHS=['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+const ldpState={
+  From:{y:new Date().getFullYear(),m:new Date().getMonth(),sel:null},
+  To:{y:new Date().getFullYear(),m:new Date().getMonth(),sel:null}
+};
+function ldpBuild(id){
+  const s=ldpState[id];
+  document.getElementById('ldp'+id+'Title').textContent=LDP_MONTHS[s.m]+' '+s.y;
+  const days=[];
+  const first=new Date(s.y,s.m,1);
+  let dow=first.getDay()-1; if(dow<0)dow=6;
+  const prevLast=new Date(s.y,s.m,0).getDate();
+  for(let i=dow-1;i>=0;i--){days.push({date:new Date(s.y,s.m-1,prevLast-i),other:true});}
+  const dim=new Date(s.y,s.m+1,0).getDate();
+  for(let d=1;d<=dim;d++)days.push({date:new Date(s.y,s.m,d),other:false});
+  const need=Math.ceil(days.length/7)*7;
+  for(let n=1;days.length<need;n++)days.push({date:new Date(s.y,s.m+1,n),other:true});
+  const today=new Date();
+  const cont=document.getElementById('ldp'+id+'Days');
+  cont.innerHTML='';
+  days.forEach(item=>{
+    const lun=solar2Lunar(item.date.getDate(),item.date.getMonth()+1,item.date.getFullYear());
+    const isTd=item.date.getFullYear()===today.getFullYear()&&item.date.getMonth()===today.getMonth()&&item.date.getDate()===today.getDate();
+    const isSel=s.sel&&item.date.toDateString()===s.sel.toDateString();
+    const isSun=item.date.getDay()===0;const isSat=item.date.getDay()===6;
+    const cls=['ldp-day',item.other?'ldp-other':'',isTd?'ldp-today':'',isSel?'ldp-sel':'',isSun?'ldp-sun':'',isSat?'ldp-sat':''].filter(Boolean).join(' ');
+    const el=document.createElement('div');
+    el.className=cls;
+    el.innerHTML=`<span class="ldp-sol">${item.date.getDate()}</span><span class="ldp-lun">${lun.day}/${lun.month}</span>`;
+    if(!item.other)el.addEventListener('click',()=>ldpSelect(id,item.date,lun));
+    cont.appendChild(el);
+  });
+}
+function ldpSelect(id,date,lun){
+  ldpState[id].sel=date;
+  const txt=document.getElementById('ldp'+id+'Text');
+  const d=date.getDate(),mo=date.getMonth()+1,y=date.getFullYear();
+  txt.textContent=`${String(d).padStart(2,'0')}/${String(mo).padStart(2,'0')}/${y} · ${lun.day}/${lun.month}/ÂL`;
+  txt.classList.remove('ph');
+  document.getElementById('ldp'+id+'Clear').style.display='flex';
+  document.getElementById('ldp'+id+'Foot').textContent=`🌙 ${lun.day} tháng ${lun.month}${lun.leap?' (nhuận)':''} Âm Lịch`;
+  ldpBuild(id);
+  setTimeout(()=>{document.getElementById('ldp'+id+'Cal').style.display='none';document.getElementById('ldp'+id+'Input').classList.remove('open');},100);
+}
+function toggleLdp(id){
+  const other=id==='From'?'To':'From';
+  document.getElementById('ldp'+other+'Cal').style.display='none';
+  document.getElementById('ldp'+other+'Input').classList.remove('open');
+  const cal=document.getElementById('ldp'+id+'Cal');
+  const inp=document.getElementById('ldp'+id+'Input');
+  if(cal.style.display==='none'){cal.style.display='block';inp.classList.add('open');ldpBuild(id);}
+  else{cal.style.display='none';inp.classList.remove('open');}
+}
+function ldpPrev(id){const s=ldpState[id];if(s.m===0){s.m=11;s.y--;}else s.m--;ldpBuild(id);}
+function ldpNext(id){const s=ldpState[id];if(s.m===11){s.m=0;s.y++;}else s.m++;ldpBuild(id);}
+function clearLdp(e,id){
+  e.stopPropagation();
+  ldpState[id].sel=null;
+  const txt=document.getElementById('ldp'+id+'Text');
+  txt.textContent='Chọn ngày...';txt.classList.add('ph');
+  document.getElementById('ldp'+id+'Clear').style.display='none';
+  document.getElementById('ldp'+id+'Foot').textContent='';
+  ldpBuild(id);
+}
+function applyDateRange(){
+  const sf=ldpState.From.sel,st=ldpState.To.sel;
+  dateFrom=sf?new Date(sf):null;
+  dateTo=st?new Date(st):null;
+  if(dateTo)dateTo.setHours(23,59,59,999);
+  let lp=[];
+  if(sf){const lun=solar2Lunar(sf.getDate(),sf.getMonth()+1,sf.getFullYear());lp.push(`${lun.day}/${lun.month}/ÂL`);}else lp.push('...');
+  if(st){const lun=solar2Lunar(st.getDate(),st.getMonth()+1,st.getFullYear());lp.push(`${lun.day}/${lun.month}/ÂL`);}else lp.push('...');
+  document.getElementById('date-label').innerHTML=`📅 ${lp[0]} → ${lp[1]}`;
+  document.getElementById('dd-date-menu').classList.remove('open');
+  document.querySelector('#dd-date .dd-btn').classList.remove('open');
+  applyFilters();
+}
+
+function buildBanDD(){
+  const bans=new Set();
+  tasks.forEach(t=>t.bans.forEach(b=>bans.add(b)));
+  const menu=document.getElementById('dd-ban-menu');
+  [...bans].sort().forEach(b=>{
+    const d=document.createElement('div');
+    d.className='dd-opt';d.textContent=b;
+    d.onclick=()=>selectBan(b,d);
+    menu.appendChild(d);
+  });
+}
+function selectBan(val,el){
+  filterBan=val;
+  document.querySelectorAll('#dd-ban-menu .dd-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('ban-label').innerHTML=`🤝 ${val==='all'?'Tất cả ban':val}`;
+  document.getElementById('dd-ban-menu').classList.remove('open');
+  document.querySelector('#dd-ban .dd-btn').classList.remove('open');
+  applyFilters();
+}
+
+/* ===== FILTER SHEET (MOBILE) ===== */
+let fsTemp = {};
+
+function openFilterSheet(){
+  fsTemp = { status: filterStatus, sort: sortMode, date: filterDate, loai: currentLoai, ban: filterBan, progress: currentStatusTab };
+  document.querySelectorAll('.fs-chip').forEach(c=>{
+    const f=c.dataset.filter, v=c.dataset.val;
+    c.classList.toggle('active', fsTemp[f]===v);
+  });
+  document.getElementById('mobKeywordInput').value = document.getElementById('keywordInput').value;
+  document.getElementById('filterSheet').classList.add('open');
+  document.getElementById('filterSheetOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeFilterSheet(){
+  document.getElementById('filterSheet').classList.remove('open');
+  document.getElementById('filterSheetOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function fsTap(btn){
+  const f = btn.dataset.filter;
+  const v = btn.dataset.val;
+  document.querySelectorAll(`.fs-chip[data-filter="${f}"]`).forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  fsTemp[f] = v;
+}
+
+function fsReset(){
+  fsTemp = { status:'all', sort:'deadline', date:'all', loai:'phoi-hop', ban:'all', progress:'active' };
+  document.querySelectorAll('.fs-chip').forEach(c=>{
+    const f=c.dataset.filter, v=c.dataset.val;
+    c.classList.toggle('active',
+      (f==='status'&&v==='all')||(f==='sort'&&v==='deadline')||
+      (f==='date'&&v==='all')||(f==='loai'&&v==='phoi-hop')||
+      (f==='ban'&&v==='all')||(f==='progress'&&v==='active')
+    );
+  });
+  document.getElementById('mobKeywordInput').value='';
+  document.getElementById('mobSearchInline').value='';
+  document.getElementById('keywordInput').value='';
+}
+
+function fsApply(){
+  const kw = document.getElementById('mobKeywordInput').value;
+  document.getElementById('keywordInput').value = kw;
+  document.getElementById('mobSearchInline').value = kw;
+
+  if(fsTemp.status) {
+    filterStatus = fsTemp.status;
+    const fakeEl = document.querySelector(`#dd-status-menu .dd-opt[onclick*="'${fsTemp.status}'"]`);
+    if(fakeEl) selectStatus(fsTemp.status, fakeEl);
+  }
+  if(fsTemp.sort) {
+    sortMode = fsTemp.sort;
+    const fakeSort = document.querySelector(`#dd-sort-menu .dd-opt[onclick*="'${fsTemp.sort}'"]`);
+    if(fakeSort) selectSort(fsTemp.sort, fakeSort);
+  }
+  if(fsTemp.date) filterDate = fsTemp.date;
+  if(fsTemp.loai) {
+    const fakeLoai = document.querySelector(`#dd-loai-menu .dd-opt[onclick*="'${fsTemp.loai}'"]`);
+    if(fakeLoai) selectLoai(fsTemp.loai, fakeLoai);
+  }
+  if(fsTemp.ban) filterBan = fsTemp.ban;
+
+  // Apply progress tab
+  if(fsTemp.progress && fsTemp.progress !== currentStatusTab) {
+    switchStatusTab(fsTemp.progress);
+  }
+
+  let activeCount = 0;
+  if(filterStatus !== 'all') activeCount++;
+  if(filterDate !== 'all') activeCount++;
+  if(filterBan !== 'all') activeCount++;
+  if(kw.trim()) activeCount++;
+  if(currentStatusTab !== 'active') activeCount++;
+  const badge = document.getElementById('mobFilterBadge');
+  if(badge){ badge.textContent=activeCount; badge.classList.toggle('show', activeCount>0); }
+
+  applyFilters();
+  closeFilterSheet();
+}
+
+function buildFsBanList(){
+  const bans=new Set();
+  tasks.forEach(t=>t.bans.forEach(b=>bans.add(b)));
+  const list=document.getElementById('fsBanList');
+  [...bans].sort().forEach(b=>{
+    const btn=document.createElement('button');
+    btn.className='fs-chip'; btn.dataset.filter='ban'; btn.dataset.val=b;
+    btn.textContent=b; btn.onclick=()=>fsTap(btn);
+    list.appendChild(btn);
+  });
+}
+
+function syncMobSearch(val){
+  document.getElementById('keywordInput').value=val;
+  applyFilters();
+}
+
+/* ===== INIT ===== */
+initTopbar();
+buildBanDD();
+buildFsBanList();
+applyFilters();
+</script>
+</body>
+</html>
