@@ -16,6 +16,16 @@
     --gray-500: #adb5bd; --gray-600: #6c757d; --gray-800: #343a40;
     --shadow-sm: 0 1px 5px rgba(0,0,0,0.06);
     --radius: 12px;
+
+    /* Opinion box colors */
+    --op-phoi-bg: #EBF4FF;
+    --op-phoi-border: #3B82F6;
+    --op-phoi-tag-bg: #DBEAFE;
+    --op-phoi-tag-color: #1D4ED8;
+    --op-sp-bg: #FFF8EC;
+    --op-sp-border: #F59E0B;
+    --op-sp-tag-bg: #FEF3C7;
+    --op-sp-tag-color: #92400E;
   }
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   body { font-family:'Be Vietnam Pro','Segoe UI',sans-serif; background:#fdf8ee; color:var(--gray-800); font-size:15px; min-height:100vh; padding-bottom:70px; }
@@ -56,13 +66,13 @@
   .mob-content-hdr {
     display:flex; align-items:center; justify-content:center;
     padding:14px 60px 10px 60px; background:white;
-    position:relative;
+    position:relative; border-bottom:none;
   }
   .mob-content-hdr-title { font-size:20px; font-weight:800; color:var(--green-dark); text-transform:uppercase; letter-spacing:.5px; text-align:center; }
   .mob-add-btn {
     position:absolute; right:16px;
-    width:36px; height:36px; background:var(--orange); border:none; border-radius:10px;
-    color:white; font-size:22px; font-weight:700; cursor:pointer;
+    width:36px; height:36px; background:#FFF3CC; border:none; border-radius:10px;
+    color:var(--orange); font-size:22px; font-weight:700; cursor:pointer;
     display:flex; align-items:center; justify-content:center; line-height:1;
   }
 
@@ -70,7 +80,7 @@
   .mob-search-bar {
     display:flex; align-items:center; gap:8px;
     background:white; padding:8px 16px 10px;
-    margin-top:7px;
+    margin-top:0;
   }
   .mob-search-inner {
     flex:1; display:flex; align-items:center; gap:8px;
@@ -82,38 +92,27 @@
   .mob-search-inner svg { width:15px; height:15px; color:var(--gray-500); flex-shrink:0; }
   .mob-search-inner input { border:none; background:transparent; font-family:inherit; font-size:14px; outline:none; flex:1; }
 
-  /* ── STATUS TOGGLE (inline next to search) ── */
+  /* ── STATUS TOGGLE ── */
   .status-toggle-wrap {
     display:flex; background:var(--gray-100); border:1.5px solid var(--gray-300);
     border-radius:20px; padding:2px; flex-shrink:0;
   }
   .status-toggle-btn {
     padding:5px 8px; border-radius:16px; font-size:16px; font-weight:700;
-    cursor:pointer; transition:all .2s; color:var(--gray-600);
+    cursor:pointer; transition:all .2s; color:var(--burgundy);
     border:none; background:transparent; font-family:inherit; line-height:1;
   }
-  .status-toggle-btn.active { background:var(--orange); color:white; box-shadow:0 2px 5px rgba(200,80,0,.25); }
+  .status-toggle-btn.active { background:var(--orange); color:#6b1a1a; box-shadow:0 2px 5px rgba(200,80,0,.25); }
   .status-toggle-btn:not(.active):hover { color:var(--orange); }
-  .status-legend {
-    display:flex; flex-direction:column; gap:6px;
-    background:white; padding:8px 16px 10px;
-    margin-top:7px;
-  }
-  .legend-title { font-size:12.5px; font-weight:700; color:var(--gray-600); }
-  .legend-dots-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-  .legend-item { display:flex; align-items:center; gap:5px; font-size:12.5px; font-weight:600; color:var(--gray-800); }
-  .legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
-  .ld-urgent    { background:#c0392b; box-shadow:0 0 0 2px rgba(192,57,43,.2); }
-  .ld-important { background:#e07b39; box-shadow:0 0 0 2px rgba(224,123,57,.18); }
-  .ld-waiting   { background:#c9a84c; box-shadow:0 0 0 2px rgba(201,168,76,.22); }
-  .ld-normal    { background:#2d6a4f; box-shadow:0 0 0 2px rgba(45,106,79,.2); }
 
   /* ── CARD LIST ── */
-  .card-list { padding:0; margin-top:7px; }
+  .card-list { padding:0; margin-top:0; }
   .task-card {
-    background:white; border-bottom:2px solid #f5e8c0;
+    background:white; border-bottom:2px solid #6b1a1a;
+    border-left:3px solid var(--orange);
     padding:15px 16px; margin-bottom:7px;
   }
+  .task-card:first-child { border-top:2px solid #6b1a1a; }
   .task-card:last-child { border-bottom:none; margin-bottom:0; }
 
   /* task header */
@@ -124,7 +123,7 @@
   .dot-waiting   { background:#c9a84c; box-shadow:0 0 0 3px rgba(201,168,76,.18); }
   .dot-done      { background:#27ae60; box-shadow:0 0 0 3px rgba(39,174,96,.18); }
   .dot-normal    { background:#2d6a4f; box-shadow:0 0 0 3px rgba(45,106,79,.18); }
-  .task-name { font-weight:800; font-size:18px; color:var(--gold); line-height:1.3; flex:1; }
+  .task-name { font-weight:800; font-size:18px; color:var(--burgundy); line-height:1.3; flex:1; }
   .chi-tiet-btn {
     flex-shrink:0; font-size:12px; font-weight:700; color:var(--orange);
     padding:4px 10px; border:1.5px solid var(--orange); border-radius:7px;
@@ -134,7 +133,100 @@
   .task-detail-txt { font-size:13.5px; color:#1a2e1a; font-weight:500; line-height:1.65; margin:5px 0; }
   .task-time { font-size:13px; color:var(--burgundy); font-weight:700; display:flex; align-items:center; gap:4px; margin-top:6px; }
 
-  /* mobile toggles */
+  /* ── OPINION BOXES (new design) ── */
+  .opinions-wrap { margin-top:12px; display:flex; flex-direction:column; gap:8px; }
+
+  .op-box {
+    border-radius:10px;
+    padding:12px 14px;
+    border-left:4px solid transparent;
+  }
+  .op-box-phoi {
+    background:var(--op-phoi-bg);
+    border-left-color:var(--op-phoi-border);
+  }
+  .op-box-sp {
+    background:var(--op-sp-bg);
+    border-left-color:var(--op-sp-border);
+  }
+
+  .op-box-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:8px; gap:8px;
+  }
+  .op-box-tag {
+    font-size:12.5px; font-weight:700; padding:3px 10px; border-radius:20px;
+  }
+  .op-box-tag-phoi {
+    background:var(--op-phoi-tag-bg); color:var(--op-phoi-tag-color);
+  }
+  .op-box-tag-sp {
+    background:var(--op-sp-tag-bg); color:var(--op-sp-tag-color);
+  }
+  .op-box-tag-bld {
+    background:#FEF3C7; color:#92400E;
+  }
+  .op-box-time {
+    font-size:12px; font-weight:700; color:var(--burgundy); white-space:nowrap; flex-shrink:0;
+  }
+  .op-box-text {
+    font-size:13.5px; color:#111a14; font-weight:500; line-height:1.65;
+    margin-bottom:9px;
+  }
+  .op-box-actions {
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  }
+
+  /* like button */
+  .like-wrap { position:relative; display:inline-block; }
+  .op-like-btn {
+    display:inline-flex; align-items:center; gap:5px; font-size:13px;
+    font-weight:600; color:var(--gray-500); cursor:pointer;
+    border:1.5px solid rgba(0,0,0,.12); border-radius:20px; padding:4px 12px;
+    background:rgba(255,255,255,.7); transition:all .15s; font-family:inherit; user-select:none;
+  }
+  .op-like-btn:hover { border-color:var(--gold); color:#a07820; background:white; }
+  .op-like-btn.liked { border-color:#e07b39; color:#e07b39; background:rgba(255,255,255,.9); }
+  .op-like-count { font-size:13px; font-weight:800; min-width:12px; text-align:center; }
+  .likes-popup {
+    position:absolute; bottom:calc(100% + 8px); left:0; z-index:500;
+    background:white; border:1.5px solid var(--gray-300); border-radius:10px;
+    box-shadow:0 6px 24px rgba(0,0,0,.15); padding:10px 14px;
+    min-width:180px; max-width:80vw; display:none; animation:popupAppear .13s ease;
+  }
+  @keyframes popupAppear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .likes-popup.open { display:block; }
+  .likes-popup-title { font-size:11px; font-weight:700; color:var(--gray-500); text-transform:uppercase; letter-spacing:.05em; margin-bottom:7px; border-bottom:1px solid var(--gray-200); padding-bottom:5px; }
+  .likes-popup-item { display:flex; align-items:center; gap:7px; padding:4px 0; font-size:13px; font-weight:600; color:var(--gray-800); border-bottom:1px solid #f0f0f0; }
+  .likes-popup-item:last-child { border-bottom:none; }
+  .likes-popup-avatar { width:22px; height:22px; border-radius:5px; background:#fff3cc; color:#a07820; font-size:9px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .likes-popup-empty { font-size:12px; color:var(--gray-500); font-style:italic; text-align:center; padding:3px 0; }
+
+  .op-edit-btn {
+    display:inline-flex; align-items:center; gap:5px; font-size:13px;
+    font-weight:600; color:var(--gray-500); cursor:pointer;
+    border:1.5px solid rgba(0,0,0,.12); border-radius:20px; padding:4px 12px;
+    background:rgba(255,255,255,.7); transition:all .15s; font-family:inherit;
+  }
+  .op-edit-btn:hover { border-color:var(--gold); color:#a07820; background:white; }
+  .op-edited-tag { font-size:12px; color:var(--gray-500); font-style:italic; }
+  .op-edit-area { width:100%; border:1.5px solid var(--gold); border-radius:7px; padding:8px 11px; font-family:inherit; font-size:14px; color:var(--gray-800); outline:none; resize:vertical; min-height:65px; margin-top:5px; background:white; }
+  .op-edit-actions { display:flex; gap:8px; margin-top:6px; }
+  .op-save-btn { padding:5px 14px; background:var(--green-main); color:white; border:none; border-radius:6px; font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+  .op-cancel-btn { padding:5px 14px; background:white; color:var(--gray-600); border:1.5px solid var(--gray-300); border-radius:6px; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer; }
+
+  /* ── OUTGOING CARDS ── */
+  .progress-wrap { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .progress-bar { flex:1; height:7px; background:var(--gray-200); border-radius:4px; overflow:hidden; }
+  .progress-fill { height:100%; border-radius:4px; transition:width .3s; }
+  .prog-done    { background:#27ae60; }
+  .prog-partial { background:#e07b39; }
+  .prog-none    { background:#dee2e6; }
+  .progress-pct { font-size:13px; font-weight:700; color:var(--gray-600); flex-shrink:0; }
+  .assigned-ban { font-size:14.5px; font-weight:700; color:var(--green-dark); margin-bottom:3px; }
+  .assigned-note { font-size:13px; color:var(--gray-600); font-weight:500; }
+
+  /* mobile toggles (kept for outgoing cards) */
   .mobile-toggles { display:flex; gap:7px; flex-wrap:wrap; margin-top:11px; padding-top:10px; border-top:1px solid #f0e4b8; }
   .mtoggle {
     display:inline-flex; align-items:center; gap:5px;
@@ -150,73 +242,11 @@
   .mtoggle.active .mtoggle-count { background:var(--green-dark); }
   .mtoggle-arrow { font-size:9px; transition:transform .2s; display:inline-block; }
 
-  /* expanded cols */
   .expand-col { display:none; margin-top:11px; padding-top:11px; border-top:1.5px dashed #e8d49a; animation:mFadeIn .2s ease; }
   .expand-col.open { display:block; }
   @keyframes mFadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
   .expand-label { font-size:11px; font-weight:700; color:var(--green-mid); text-transform:uppercase; letter-spacing:.05em; margin-bottom:7px; }
   .expand-label.sp { color:var(--burgundy); }
-
-  /* opinions */
-  .opinion-block { font-size:14.5px; line-height:1.7; color:#111a14; }
-  .op-text { font-weight:500; }
-  .op-author { font-size:13.5px; color:#2d3f35; margin-top:7px; display:flex; align-items:center; gap:6px; font-weight:600; flex-wrap:wrap; }
-  .op-time { color:var(--burgundy); font-size:13px; font-weight:700; }
-  .author-tag { padding:2px 8px; border-radius:5px; font-weight:700; font-size:13px; }
-  .tag-normal { background:#fff3cc; color:#7a5500; }
-  .tag-sp  { background:#ffe0e0; color:#8b0000; }
-  .tag-bld { background:#fff3cd; color:#7a4a00; }
-  .op-divider { border:none; border-top:1px dashed #e5d8b0; margin:11px 0; }
-  .sp-block + .sp-block { border-top:1.5px dashed #d4b47a; padding-top:11px; margin-top:11px; }
-
-  /* opinion actions */
-  .op-actions { display:flex; align-items:center; gap:8px; margin-top:6px; flex-wrap:wrap; }
-  .like-wrap { position:relative; display:inline-block; }
-  .op-like-btn {
-    display:inline-flex; align-items:center; gap:5px; font-size:13px;
-    font-weight:600; color:var(--gray-500); cursor:pointer;
-    border:1.5px solid var(--gray-300); border-radius:20px; padding:4px 12px;
-    background:white; transition:all .15s; font-family:inherit; user-select:none;
-  }
-  .op-like-btn:hover { border-color:var(--gold); color:#a07820; background:#FFFDF5; }
-  .op-like-btn.liked { border-color:#e07b39; color:#e07b39; background:#fef3ec; }
-  .op-like-count { font-size:13px; font-weight:800; min-width:12px; text-align:center; }
-  .likes-popup {
-    position:absolute; bottom:calc(100% + 8px); left:0; z-index:500;
-    background:white; border:1.5px solid var(--gray-300); border-radius:10px;
-    box-shadow:0 6px 24px rgba(0,0,0,.15); padding:10px 14px;
-    min-width:180px; max-width:80vw; display:none; animation:popupAppear .13s ease;
-  }
-  @keyframes popupAppear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-  .likes-popup.open { display:block; }
-  .likes-popup-title { font-size:11px; font-weight:700; color:var(--gray-500); text-transform:uppercase; letter-spacing:.05em; margin-bottom:7px; border-bottom:1px solid var(--gray-200); padding-bottom:5px; }
-  .likes-popup-item { display:flex; align-items:center; gap:7px; padding:4px 0; font-size:13px; font-weight:600; color:var(--gray-800); border-bottom:1px solid #f0f0f0; }
-  .likes-popup-item:last-child { border-bottom:none; }
-  .likes-popup-avatar { width:22px; height:22px; border-radius:5px; background:#fff3cc; color:#a07820; font-size:9px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .likes-popup-empty { font-size:12px; color:var(--gray-500); font-style:italic; text-align:center; padding:3px 0; }
-  .op-edit-btn {
-    display:inline-flex; align-items:center; gap:5px; font-size:13px;
-    font-weight:600; color:var(--gray-500); cursor:pointer;
-    border:1.5px solid var(--gray-300); border-radius:20px; padding:4px 12px;
-    background:white; transition:all .15s; font-family:inherit;
-  }
-  .op-edit-btn:hover { border-color:var(--gold); color:#a07820; background:#FFFDF5; }
-  .op-edited-tag { font-size:12px; color:var(--gray-500); font-style:italic; }
-  .op-edit-area { width:100%; border:1.5px solid var(--gold); border-radius:7px; padding:8px 11px; font-family:inherit; font-size:14px; color:var(--gray-800); outline:none; resize:vertical; min-height:65px; margin-top:5px; }
-  .op-edit-actions { display:flex; gap:8px; margin-top:6px; }
-  .op-save-btn { padding:5px 14px; background:var(--green-main); color:white; border:none; border-radius:6px; font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; }
-  .op-cancel-btn { padding:5px 14px; background:white; color:var(--gray-600); border:1.5px solid var(--gray-300); border-radius:6px; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer; }
-
-  /* ── OUTGOING CARDS ── */
-  .progress-wrap { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-  .progress-bar { flex:1; height:7px; background:var(--gray-200); border-radius:4px; overflow:hidden; }
-  .progress-fill { height:100%; border-radius:4px; transition:width .3s; }
-  .prog-done    { background:#27ae60; }
-  .prog-partial { background:#e07b39; }
-  .prog-none    { background:#dee2e6; }
-  .progress-pct { font-size:13px; font-weight:700; color:var(--gray-600); flex-shrink:0; }
-  .assigned-ban { font-size:14.5px; font-weight:700; color:var(--green-dark); margin-bottom:3px; }
-  .assigned-note { font-size:13px; color:var(--gray-600); font-weight:500; }
 
   /* ── PAGINATION ── */
   .bottom-bar { display:flex; align-items:center; justify-content:space-between; padding:14px 16px 8px; flex-wrap:wrap; gap:8px; background:white; border-top:1px solid var(--gray-200); }
@@ -247,7 +277,6 @@
   .fs-close { width:30px; height:30px; border-radius:50%; background:var(--gray-100); border:none; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#111; }
   .fs-body { overflow-y:auto; padding:8px 0; flex:1; }
 
-  /* Accordion sections */
   .fs-acc { border-bottom:1px solid var(--gray-200); }
   .fs-acc-header {
     display:flex; align-items:center; justify-content:space-between;
@@ -256,13 +285,12 @@
   }
   .fs-acc-header:active { background:#fafafa; }
   .fs-acc-label { font-size:15px; font-weight:700; color:#111; }
-  .fs-acc-value { font-size:13px; color:var(--orange); font-weight:600; margin-right:8px; }
+  .fs-acc-value { font-size:13px; color:var(--burgundy); font-weight:600; margin-right:8px; }
   .fs-acc-arrow { font-size:11px; color:#666; transition:transform .2s; }
   .fs-acc-header.open .fs-acc-arrow { transform:rotate(180deg); }
   .fs-acc-body { display:none; padding:4px 18px 14px; }
   .fs-acc-body.open { display:block; }
 
-  /* Options inside accordion */
   .fs-opt {
     display:flex; align-items:center; justify-content:space-between;
     padding:11px 14px; border-radius:10px; cursor:pointer;
@@ -275,7 +303,6 @@
   .fs-opt-check { font-size:16px; opacity:0; }
   .fs-opt.active .fs-opt-check { opacity:1; color:var(--orange); }
 
-  /* Search in sheet */
   .fs-search { display:flex; align-items:center; gap:8px; background:var(--gray-100); border:1.5px solid var(--gray-300); border-radius:10px; padding:8px 13px; margin:4px 18px 10px; }
   .fs-search:focus-within { border-color:var(--orange); background:white; }
   .fs-search svg { width:14px; height:14px; color:#666; flex-shrink:0; }
@@ -338,13 +365,11 @@
     <button class="fs-close" onclick="closeFilterSheet()">✕</button>
   </div>
   <div class="fs-body">
-    <!-- Search -->
     <div class="fs-search" style="margin-top:8px;">
       <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       <input type="text" id="mobKeywordInput" placeholder="Tìm tên việc, nội dung...">
     </div>
 
-    <!-- Sắp xếp -->
     <div class="fs-acc">
       <button class="fs-acc-header" onclick="toggleAcc(this)">
         <span class="fs-acc-label">Sắp xếp theo</span>
@@ -360,7 +385,6 @@
       </div>
     </div>
 
-    <!-- Trạng thái -->
     <div class="fs-acc">
       <button class="fs-acc-header" onclick="toggleAcc(this)">
         <span class="fs-acc-label">Trạng thái</span>
@@ -378,7 +402,6 @@
       </div>
     </div>
 
-    <!-- Tiến độ -->
     <div class="fs-acc">
       <button class="fs-acc-header" onclick="toggleAcc(this)">
         <span class="fs-acc-label">Tiến độ</span>
@@ -393,7 +416,6 @@
       </div>
     </div>
 
-    <!-- Thời gian -->
     <div class="fs-acc">
       <button class="fs-acc-header" onclick="toggleAcc(this)">
         <span class="fs-acc-label">Thời gian</span>
@@ -410,7 +432,6 @@
       </div>
     </div>
 
-    <!-- Loại công việc -->
     <div class="fs-acc">
       <button class="fs-acc-header" onclick="toggleAcc(this)">
         <span class="fs-acc-label">Loại công việc</span>
@@ -425,7 +446,6 @@
       </div>
     </div>
 
-    <!-- Các ban -->
     <div class="fs-acc" style="border-bottom:none;">
       <button class="fs-acc-header" onclick="toggleAcc(this)">
         <span class="fs-acc-label">Các ban</span>
@@ -521,13 +541,18 @@ function convertTimeRange(s){
   if(mS) return toAL(mS[1]+'/'+mS[2]+'/'+mS[3])+mS[4];
   return s;
 }
-function convertOpDate(ds){
-  if(!ds) return '';
+function parseOpDate(ds){
+  if(!ds) return {time:'',date:''};
   const m=ds.match(/(\d{2})\/(\d{2})\s*·\s*(\d{2}:\d{2})/);
-  if(m){ return `<span class="op-time">${m[3]} · ${toAL(m[1]+'/'+m[2]+'/2026')}</span>`; }
+  if(m) return {time:m[3], date:toAL(m[1]+'/'+m[2]+'/2026')};
   const m2=ds.match(/(\d{2})\/(\d{2})\s*·\s*(.*)/);
-  if(m2) return `<span class="op-time">${toAL(m2[1]+'/'+m2[2]+'/2026')} · ${m2[3]}</span>`;
-  return ds;
+  if(m2) return {time:'', date:toAL(m2[1]+'/'+m2[2]+'/2026')+' · '+m2[3]};
+  return {time:'', date:ds};
+}
+function opTimeLabel(ds){
+  const p=parseOpDate(ds);
+  if(p.time) return `${p.time} · ${p.date}`;
+  return p.date;
 }
 function truncateWords(str,maxWords){
   if(!str) return '';
@@ -708,48 +733,63 @@ function switchStatusTab(tab){
   currentPage=1;renderPage();renderPagination();
 }
 
-/* ===== RENDER OPINIONS ===== */
-function renderOpPhoi(list,taskId){
-  if(!list||!list.length) return `<span style="color:#bbb;font-size:13px;font-style:italic;">Chưa có ý kiến…</span>`;
-  return list.map((op,i)=>{
-    const likers=sampleLikers[op.id]||[];
-    return `${i>0?'<hr class="op-divider">':''}
-    <div class="opinion-block" id="opblock_${op.id}">
-      <div class="op-text" id="optext_${op.id}">${truncateWords(op.text,35)}</div>
-    </div>
-    <div class="op-author">
-      <span class="author-tag tag-normal">${op.author}</span>
-      ${convertOpDate(op.date)}
-      ${op.edited?'<span class="op-edited-tag">· đã chỉnh sửa</span>':''}
-    </div>
-    <div class="op-actions">
-      <div class="like-wrap" id="likewrap_${op.id}">
-        <button class="op-like-btn ${op.liked?'liked':''}" onclick="toggleLike('${taskId}','${op.id}',this)">
-          <span>${op.liked?'❤️':'🤍'}</span>
-          <span class="op-like-count">${op.likes}</span>
-          <span style="font-size:12px;opacity:.7;">thích</span>
-        </button>
-        <div class="likes-popup" id="likespopup_${op.id}">
-          <div class="likes-popup-title">Đã thích ❤️</div>
-          ${likers.length===0?'<div class="likes-popup-empty">Chưa có ai thích</div>':likers.map(n=>`<div class="likes-popup-item"><div class="likes-popup-avatar">${n.slice(-2)}</div>${n}</div>`).join('')}
-        </div>
-      </div>
-      <button class="op-edit-btn" onclick="startEdit('${taskId}','${op.id}')">✏️ Sửa</button>
-    </div>`;
-  }).join('');
-}
+/* ===== RENDER OPINION BOXES (new design) ===== */
+function renderOpinionBoxes(task) {
+  const phoi = task.phoi_hop || [];
+  const sp = task.sp_bld || [];
+  if (!phoi.length && !sp.length) return '';
 
-function renderOpSP(list){
-  if(!list||!list.length) return '';
-  return [...list].sort((a,b)=>({sp:0,bld:1}[a.type]??2)-({sp:0,bld:1}[b.type]??2))
-    .map(op=>`<div class="sp-block">
-      <div class="opinion-block"><div class="op-text">${truncateWords(op.text,35)}</div></div>
-      <div class="op-author"><span class="author-tag ${op.type==='sp'?'tag-sp':op.type==='bld'?'tag-bld':'tag-normal'}">${op.author}</span>${convertOpDate(op.date)}</div>
-    </div>`).join('');
+  let html = '<div class="opinions-wrap">';
+
+  // Ban Phoi Hop boxes (blue)
+  phoi.forEach(op => {
+    const likers = sampleLikers[op.id] || [];
+    html += `
+    <div class="op-box op-box-phoi" id="opbox_${op.id}">
+      <div class="op-box-header">
+        <span class="op-box-tag op-box-tag-phoi">${op.author}</span>
+        <span class="op-box-time">${opTimeLabel(op.date)}</span>
+      </div>
+      <div class="op-box-text" id="optext_${op.id}">${truncateWords(op.text, 35)}</div>
+      ${op.edited ? '<div class="op-edited-tag" style="margin-bottom:6px;">· đã chỉnh sửa</div>' : ''}
+      <div class="op-box-actions">
+        <div class="like-wrap" id="likewrap_${op.id}">
+          <button class="op-like-btn ${op.liked ? 'liked' : ''}" onclick="toggleLike('${task.id}','${op.id}',this)">
+            <span>${op.liked ? '👍' : '👍'}</span>
+            <span class="op-like-count">${op.likes}</span>
+            <span style="font-size:12px;opacity:.7;">thích</span>
+          </button>
+          <div class="likes-popup" id="likespopup_${op.id}">
+            <div class="likes-popup-title">Đã thích ❤️</div>
+            ${likers.length === 0
+              ? '<div class="likes-popup-empty">Chưa có ai thích</div>'
+              : likers.map(n => `<div class="likes-popup-item"><div class="likes-popup-avatar">${n.slice(-2)}</div>${n}</div>`).join('')}
+          </div>
+        </div>
+        <button class="op-edit-btn" onclick="startEdit('${task.id}','${op.id}')">✏️ Sửa</button>
+      </div>
+    </div>`;
+  });
+
+  // Sư Phụ / BLĐ boxes (yellow/amber)
+  [...sp].sort((a,b)=>({sp:0,bld:1}[a.type]??2)-({sp:0,bld:1}[b.type]??2))
+    .forEach(op => {
+      const tagClass = op.type === 'sp' ? 'op-box-tag-sp' : 'op-box-tag-bld';
+      html += `
+    <div class="op-box op-box-sp">
+      <div class="op-box-header">
+        <span class="op-box-tag ${tagClass}">${op.author}</span>
+        <span class="op-box-time">${opTimeLabel(op.date)}</span>
+      </div>
+      <div class="op-box-text">${truncateWords(op.text, 35)}</div>
+    </div>`;
+    });
+
+  html += '</div>';
+  return html;
 }
 
 /* ===== LIKE / EDIT ===== */
-let hideTimers={};
 function toggleLike(taskId,opId,btn){
   const task=tasks.find(t=>String(t.id)===String(taskId));if(!task)return;
   const op=task.phoi_hop.find(o=>o.id===opId);if(!op)return;
@@ -758,14 +798,16 @@ function toggleLike(taskId,opId,btn){
   if(op.liked){if(!likers.includes('Phan Tuấn Anh'))likers.push('Phan Tuấn Anh');}
   else{const idx=likers.indexOf('Phan Tuấn Anh');if(idx>=0)likers.splice(idx,1);}
   sampleLikers[op.id]=likers;
-  btn.innerHTML=`<span>${op.liked?'❤️':'🤍'}</span><span class="op-like-count">${op.likes}</span><span style="font-size:12px;opacity:.7;">thích</span>`;
+  btn.innerHTML=`<span>👍</span><span class="op-like-count">${op.likes}</span><span style="font-size:12px;opacity:.7;">thích</span>`;
   btn.classList.toggle('liked',op.liked);
 }
+
 function startEdit(taskId,opId){
   const task=tasks.find(t=>String(t.id)===String(taskId));if(!task)return;
   const op=task.phoi_hop.find(o=>o.id===opId);if(!op)return;
-  const block=document.getElementById('opblock_'+opId);if(!block)return;
-  block.innerHTML=`<textarea class="op-edit-area" id="editarea_${opId}">${op.text}</textarea><div class="op-edit-actions"><button class="op-save-btn" onclick="saveEdit('${taskId}','${opId}')">✓ Lưu</button><button class="op-cancel-btn" onclick="cancelEdit('${taskId}','${opId}')">Hủy</button></div>`;
+  const box=document.getElementById('opbox_'+opId);if(!box)return;
+  const textEl=box.querySelector('#optext_'+opId);if(!textEl)return;
+  textEl.innerHTML=`<textarea class="op-edit-area" id="editarea_${opId}">${op.text}</textarea><div class="op-edit-actions"><button class="op-save-btn" onclick="saveEdit('${taskId}','${opId}')">✓ Lưu</button><button class="op-cancel-btn" onclick="cancelEdit('${taskId}','${opId}')">Hủy</button></div>`;
 }
 function saveEdit(taskId,opId){
   const task=tasks.find(t=>String(t.id)===String(taskId));if(!task)return;
@@ -776,11 +818,11 @@ function saveEdit(taskId,opId){
 function cancelEdit(taskId,opId){
   const task=tasks.find(t=>String(t.id)===String(taskId));if(!task)return;
   const op=task.phoi_hop.find(o=>o.id===opId);if(!op)return;
-  const block=document.getElementById('opblock_'+opId);if(!block)return;
-  block.innerHTML=`<div class="op-text" id="optext_${opId}">${truncateWords(op.text,35)}</div>`;
+  const textEl=document.getElementById('optext_'+opId);if(!textEl)return;
+  textEl.innerHTML=truncateWords(op.text,35);
 }
 
-/* ===== MOBILE TOGGLE ===== */
+/* ===== MOBILE TOGGLE (for outgoing cards) ===== */
 function mToggle(btn,colId){
   const card=btn.closest('.task-card');
   const col=card.querySelector('#'+colId);
@@ -807,9 +849,6 @@ function renderPage(){
   body.innerHTML=slice.map(t=>{
     const dc=getDotClass(t);
     const tAL=convertTimeRange(t.time);
-    const phoiCount=(t.phoi_hop||[]).length;
-    const spCount=(t.sp_bld||[]).length;
-    const uid='t'+t.id;
     return `<div class="task-card">
       <div class="task-header">
         ${dc?`<span class="status-dot ${dc}"></span>`:''}
@@ -818,12 +857,7 @@ function renderPage(){
       </div>
       ${t.detail?`<div class="task-detail-txt">${truncateWords(t.detail,30)}</div>`:''}
       ${tAL?`<div class="task-time">📅 ${tAL}</div>`:''}
-      <div class="mobile-toggles">
-        ${phoiCount>0?`<button class="mtoggle" onclick="mToggle(this,'${uid}_phoi')">💬 Ý kiến <span class="mtoggle-count">${phoiCount}</span> <span class="mtoggle-arrow">▼</span></button>`:''}
-        ${spCount>0?`<button class="mtoggle" onclick="mToggle(this,'${uid}_sp')">🙏 Sư Phụ/BLĐ <span class="mtoggle-count">${spCount}</span> <span class="mtoggle-arrow">▼</span></button>`:''}
-      </div>
-      ${phoiCount>0?`<div class="expand-col" id="${uid}_phoi"><div class="expand-label">💬 Ý Kiến Ban Phối Hợp</div>${renderOpPhoi(t.phoi_hop,t.id)}</div>`:''}
-      ${spCount>0?`<div class="expand-col" id="${uid}_sp"><div class="expand-label sp">🙏 Sư Phụ / BLĐ Chỉ Dạy</div>${renderOpSP(t.sp_bld)}</div>`:''}
+      ${renderOpinionBoxes(t)}
     </div>`;
   }).join('');
 }
@@ -865,8 +899,8 @@ function renderOutPage(){
           <div class="progress-bar"><div class="progress-fill ${progClass}" style="width:${t.progress}%"></div></div>
           <span class="progress-pct">${t.progress}%</span>
         </div>
-        ${t.latestReport?`<div class="opinion-block"><div class="op-text">${truncateWords(t.latestReport,35)}</div></div>`:''}
-        ${t.reportDate?`<div class="op-author" style="margin-top:5px;">${convertOpDate(t.reportDate)}</div>`:''}
+        ${t.latestReport?`<div style="font-size:13.5px;color:#111a14;font-weight:500;line-height:1.65;">${truncateWords(t.latestReport,35)}</div>`:''}
+        ${t.reportDate?`<div style="margin-top:5px;font-size:12px;color:var(--burgundy);font-weight:700;">${opTimeLabel(t.reportDate)}</div>`:''}
       </div>
     </div>`;
   }).join('');
@@ -933,11 +967,9 @@ function toggleAcc(hdr) {
 function fsOptTap(btn) {
   const f = btn.dataset.filter;
   const v = btn.dataset.val;
-  // deselect siblings
   btn.closest('.fs-acc-body').querySelectorAll('.fs-opt').forEach(o => o.classList.remove('active'));
   btn.classList.add('active');
   fsTemp[f] = v;
-  // update header value label
   const valEl = document.getElementById('acc-val-' + f);
   if (valEl) {
     const banLabel = f === 'ban' && v !== 'all' ? v : null;
@@ -947,12 +979,10 @@ function fsOptTap(btn) {
 
 function openFilterSheet(){
   fsTemp = { status:filterStatus, sort:sortMode, date:filterDate, loai:currentLoai, ban:filterBan, progress:currentStatusTab };
-  // sync opt active states
   document.querySelectorAll('.fs-opt').forEach(o => {
     const f = o.dataset.filter, v = o.dataset.val;
     o.classList.toggle('active', fsTemp[f] === v);
   });
-  // sync value labels
   Object.keys(fsTemp).forEach(f => {
     const valEl = document.getElementById('acc-val-' + f);
     if (!valEl) return;
@@ -970,7 +1000,6 @@ function closeFilterSheet(){
   document.getElementById('filterSheet').classList.remove('open');
   document.getElementById('filterSheetOverlay').classList.remove('open');
   document.body.style.overflow='';
-  // close all accordions
   document.querySelectorAll('.fs-acc-header.open').forEach(h => { h.classList.remove('open'); h.nextElementSibling.classList.remove('open'); });
 }
 
@@ -1032,3 +1061,4 @@ applyFilters();
 </script>
 </body>
 </html>
+
